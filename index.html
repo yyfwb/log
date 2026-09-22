@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a6dff">
+<meta name="format-detection" content="telephone=no">
+<title>转播技术组日志</title>
+<script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
+<style>
+:root{
+  --bg:#f2f4f8; --card:#ffffff; --line:#e5e9f1; --line2:#eef1f7;
+  --txt:#16202f; --txt2:#5b6980; --txt3:#8e9ab0;
+  --blue:#1a6dff; --blue-d:#0b4fc4; --blue-bg:#eaf1ff;
+  --orange:#e07b16; --orange-bg:#fff4e6;
+  --green:#0f9152; --green-bg:#e7f8ef;
+  --purple:#7c4ded; --purple-bg:#f2ecff;
+  --red:#e04a41;
+  --r:14px; --tabbar:62px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg); color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Helvetica Neue",Arial,sans-serif;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--tabbar) + env(safe-area-inset-bottom) + 8px);
+}
+h1,h2,h3{margin:0;font-weight:600;}
+button,input,select,textarea{font-family:inherit;color:inherit;}
+button{cursor:pointer;border:none;background:none;font-size:15px;}
+svg{display:block;}
+
+/* ============ 顶栏 ============ */
+.appbar{
+  position:sticky; top:0; z-index:30;
+  background:#fff; border-bottom:1px solid var(--line);
+  padding:8px 14px calc(8px + env(safe-area-inset-top)) 14px;
+  padding-top:calc(8px + env(safe-area-inset-top));
+}
+.appbar-in{display:flex;align-items:center;gap:9px;max-width:760px;margin:0 auto;}
+.applogo{
+  width:30px;height:30px;border-radius:9px;flex:none;
+  background:linear-gradient(135deg,#1a6dff,#3f8dff);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;
+}
+.appbar-t{display:flex;align-items:baseline;gap:7px;min-width:0;flex:1;}
+.apptitle{font-size:15px;font-weight:600;letter-spacing:.2px;white-space:nowrap;flex:none;}
+.appdate{font-size:11.5px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.appbar .chip{
+  margin-left:auto;flex:none;font-size:11.5px;color:var(--blue-d);background:var(--blue-bg);
+  padding:3px 9px;border-radius:20px;white-space:nowrap;
+}
+
+/* ============ 页面 ============ */
+main{max-width:760px;margin:0 auto;padding:10px 16px 8px;}
+.page{display:none;}
+.page.active{display:block;animation:in .22s ease;}
+@keyframes in{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+
+.page-head{display:flex;align-items:baseline;gap:9px;margin:2px 2px 9px;}
+.page-head h2{font-size:16px;}
+.page-head .sub{font-size:12.5px;color:var(--txt3);}
+.count{margin-left:auto;font-size:12px;color:var(--txt2);background:#fff;
+  border:1px solid var(--line);padding:3px 10px;border-radius:20px;white-space:nowrap;}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px;margin-bottom:12px;box-shadow:0 1px 2px rgba(22,32,47,.03);}
+
+/* ============ 表单 ============ */
+.field{margin-bottom:16px;}
+.field:last-child{margin-bottom:0;}
+.lb{display:block;font-size:13.5px;font-weight:600;color:var(--txt2);margin-bottom:7px;}
+.lb em{color:var(--red);font-style:normal;font-weight:400;margin-left:2px;}
+.lb .opt{font-size:12px;font-weight:400;color:var(--txt3);margin-left:5px;}
+
+input[type=text],input[type=date],input[type=number],select,textarea{
+  width:100%;border:1px solid var(--line);border-radius:11px;background:#fbfcfe;
+  font-size:16px;padding:12px 13px;min-height:50px;outline:none;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+  appearance:none;-webkit-appearance:none;
+}
+select{
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e9ab0' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:18px;padding-right:38px;
+}
+textarea{resize:vertical;min-height:104px;line-height:1.65;padding-top:12px;font-size:16px;}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,109,255,.11);}
+select:disabled{color:var(--txt3);background-color:#f5f7fa;}
+
+.taskinfo{
+  margin-top:8px;font-size:12.5px;color:var(--txt2);background:#f5f8fd;
+  border:1px solid var(--line2);border-radius:10px;padding:9px 11px;line-height:1.6;
+}
+.pill{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:20px;background:#eef1f7;color:var(--txt2);}
+.pill.doing{background:var(--blue-bg);color:var(--blue-d);}
+.pill.done{background:var(--green-bg);color:var(--green);}
+.pill.todo{background:#f0f2f7;color:var(--txt3);}
+
+/* ============ 照片 ============ */
+.pbtns{display:flex;gap:10px;}
+.pbtn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  min-height:50px;border-radius:11px;border:1px dashed #c3d2e8;background:#fafcff;
+  color:var(--blue-d);font-size:14px;font-weight:500;transition:.15s;
+}
+.pbtn:active,.pbtn:hover{border-color:var(--blue);background:var(--blue-bg);}
+.pbtn.ghost{color:var(--txt2);border-color:var(--line);}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:11px;}
+.thumbs:empty{margin-top:0;}
+.thumb{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);aspect-ratio:1/1;background:#fff;}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.thumb .del{
+  position:absolute;right:5px;top:5px;width:24px;height:24px;border-radius:50%;
+  background:rgba(12,20,35,.6);color:#fff;font-size:15px;line-height:24px;text-align:center;
+}
+.thumb .no{position:absolute;left:5px;top:5px;background:rgba(12,20,35,.55);color:#fff;
+  font-size:11px;padding:1px 7px;border-radius:20px;}
+
+/* ============ 按钮 ============ */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  min-height:52px;border-radius:12px;font-size:16px;font-weight:600;transition:.15s;
+}
+.btn.primary{background:var(--blue);color:#fff;box-shadow:0 8px 18px -10px rgba(26,109,255,.95);}
+.btn.primary:active{background:var(--blue-d);}
+.btn.primary.o{background:var(--orange);box-shadow:0 8px 18px -10px rgba(224,123,22,.95);}
+.btn.primary.g{background:var(--green);box-shadow:0 8px 18px -10px rgba(15,145,82,.95);}
+.btn.plain{background:#fff;border:1px solid var(--line);color:var(--txt2);font-weight:500;font-size:15px;min-height:48px;}
+.btn.plain:active{border-color:var(--blue);color:var(--blue);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+.row2 .btn{min-height:48px;font-size:14.5px;}
+.row2.fill{grid-template-columns:1fr 1.25fr;margin-top:0;}
+.row2.fill .btn{min-height:50px;}
+.row2.fill .btn.primary{font-size:16px;}
+.actions{margin-top:16px;}
+
+/* ============ 汇总 ============ */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 14px;position:relative;overflow:hidden;}
+.stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue);}
+.stat.o::before{background:var(--orange);}
+.stat.g::before{background:var(--green);}
+.stat.p::before{background:var(--purple);}
+.stat .k{font-size:12.5px;color:var(--txt3);}
+.stat .v{font-size:23px;font-weight:700;letter-spacing:-.5px;line-height:1.25;}
+.stat .v small{font-size:12px;font-weight:500;color:var(--txt3);margin-left:3px;}
+
+.sec-title{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;margin:18px 2px 10px;}
+.sec-title::before{content:'';width:8px;height:8px;border-radius:3px;background:var(--txt3);flex:none;}
+.sec-title.office::before{background:var(--blue);}
+.sec-title.site::before{background:var(--orange);}
+.sec-title.accept::before{background:var(--green);}
+.tbl-wrap{background:#fff;border:1px solid var(--line);border-radius:13px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:340px;}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line2);white-space:nowrap;}
+th{background:#f7f9fd;font-size:12px;color:var(--txt2);font-weight:600;}
+tbody tr:last-child td{border-bottom:none;}
+td.num,th.num{text-align:right;}
+tr.total td{background:#f7f9fd;font-weight:600;}
+
+.rec{background:#fff;border:1px solid var(--line);border-radius:13px;margin-bottom:10px;overflow:hidden;}
+.rec-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:11px 13px;background:#fafcfe;border-bottom:1px solid var(--line2);}
+.tag{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:20px;flex:none;}
+.tag.office{background:var(--blue-bg);color:var(--blue-d);}
+.tag.site{background:var(--orange-bg);color:#9a5409;}
+.tag.accept{background:var(--green-bg);color:var(--green);}
+.rec-hd .nm{font-size:13.5px;font-weight:600;}
+.rec-hd .tk{font-size:12.5px;color:var(--txt3);}
+.rec-hd .del{margin-left:auto;font-size:12.5px;color:var(--red);padding:4px 8px;border-radius:8px;flex:none;}
+.rec-hd .del:active{background:#fdecea;}
+.rec-bd{padding:12px 13px;}
+.kv{margin-bottom:12px;}
+.kv:last-child{margin-bottom:0;}
+.kv .k{color:var(--txt3);font-size:12.5px;margin-bottom:2px;}
+.kv .v{font-size:14.5px;white-space:pre-wrap;word-break:break-word;}
+.kv .v.photos{display:flex;flex-wrap:wrap;gap:7px;margin-top:3px;}
+.kv .v.photos img{width:72px;height:72px;object-fit:cover;border-radius:9px;border:1px solid var(--line);}
+.empty{background:#fff;border:1px solid var(--line);border-radius:13px;padding:44px 20px;text-align:center;color:var(--txt3);font-size:13.5px;}
+.empty.small{padding:20px 14px;font-size:13px;}
+.empty .ic{font-size:30px;opacity:.45;margin-bottom:8px;}
+
+/* ============ 底部导航 ============ */
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  background:#fff;border-top:1px solid var(--line);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);
+  height:calc(var(--tabbar) + env(safe-area-inset-bottom));
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font-size:11.5px;color:var(--txt3);font-weight:500;transition:color .15s;
+}
+.tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.tab.active{color:var(--blue);}
+.tab[data-page=site].active{color:var(--orange);}
+.tab[data-page=accept].active{color:var(--green);}
+.tab[data-page=summary].active{color:var(--purple);}
+
+/* ============ 提示 / 灯箱 ============ */
+#toast{
+  position:fixed;left:50%;bottom:calc(var(--tabbar) + env(safe-area-inset-bottom) + 18px);
+  transform:translate(-50%,26px);background:#16202f;color:#fff;
+  padding:11px 20px;border-radius:11px;font-size:14px;max-width:86vw;text-align:center;
+  box-shadow:0 12px 28px -10px rgba(0,0,0,.5);opacity:0;transition:.26s;z-index:90;pointer-events:none;
+}
+#toast.show{transform:translate(-50%,0);opacity:1;}
+#lightbox{position:fixed;inset:0;background:rgba(10,17,29,.9);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+#lightbox.show{display:flex;}
+#lightbox img{max-width:100%;max-height:82vh;border-radius:10px;}
+#lightbox .close{position:absolute;top:calc(18px + env(safe-area-inset-top));right:20px;color:#fff;font-size:30px;line-height:1;opacity:.85;}
+
+/* ============ 汇总：日期导航 ============ */
+.print-head{display:none;}
+.datebar{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
+.db-nav{width:46px;height:46px;flex:none;border-radius:12px;background:#f1f5fb;color:var(--txt2);
+  font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.db-nav:active{background:var(--blue-bg);color:var(--blue);}
+.db-nav:disabled{opacity:.32;}
+.db-all{width:auto;padding:0 12px;font-size:13px;font-weight:600;color:var(--txt2);}
+.db-all.active{color:var(--blue);background:var(--blue-bg);}
+.db-mid{flex:1;text-align:center;min-width:0;}
+.db-mid input[type=date]{width:100%;border:none;background:transparent;text-align:center;
+  font-size:17px;font-weight:600;color:var(--txt);padding:2px 0;font-family:inherit;}
+.db-wk{font-size:12px;color:var(--txt3);margin-top:2px;}
+
+/* ============ 汇总：子项目方框 ============ */
+.pbox{background:#fff;border:1px solid var(--line);border-left:3px solid var(--blue);
+  border-radius:14px;margin-bottom:12px;overflow:hidden;}
+.pbox.t-office{border-left-color:var(--blue);}
+.pbox.t-site{border-left-color:var(--orange);}
+.pbox.t-accept{border-left-color:var(--green);}
+.pbox-hd{display:flex;align-items:center;gap:8px;padding:12px 13px;background:#fafcfe;border-bottom:1px solid var(--line2);}
+.pbox-hd .pn{font-size:15px;font-weight:600;flex:1;word-break:break-word;}
+.pbox-hd .pc{font-size:12px;color:var(--txt3);flex:none;text-align:right;}
+.pbox-bd{padding:2px 13px 12px;}
+.pg-hd{display:flex;align-items:center;gap:7px;margin:11px 0 2px;}
+.pg-hd .cnt{font-size:12px;color:var(--txt3);}
+.ent{padding:11px 0;border-top:1px solid var(--line2);}
+.pbox-bd .pg-hd:first-child + .ent,.pbox-bd > .ent:first-child{border-top:none;}
+.ent-hd{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.ent-hd .tk{flex:1;font-size:13.5px;font-weight:600;line-height:1.5;word-break:break-word;}
+.ent-hd .del{flex:none;font-size:12px;color:var(--red);padding:3px 8px;border-radius:8px;}
+.ent-hd .del:active{background:#fdecea;}
+
+/* ============ 宽屏 ============ */
+@media (min-width:820px){
+  body{background:#eef1f6;}
+  main{padding:20px 16px 8px;}
+  .tabbar{width:760px;left:50%;transform:translateX(-50%);border-radius:14px 14px 0 0;border-left:1px solid var(--line);border-right:1px solid var(--line);}
+  .stats{grid-template-columns:repeat(4,1fr);}
+  .thumbs{grid-template-columns:repeat(5,1fr);}
+  .row2{grid-template-columns:220px 220px;}
+}
+@media print{
+  .appbar,.tabbar,.actions,.row2,.pbtns,.no-print,.tab,.datebar{display:none!important;}
+  .print-head{display:block;font-size:17px;font-weight:700;margin:0 0 12px;}
+  .del{display:none!important;}
+  .stats{grid-template-columns:repeat(4,1fr);}
+  body{background:#fff;padding:0;}
+  .card,.rec,.tbl-wrap,.empty,.pbox,.stat{border-color:#ddd;box-shadow:none;break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="appbar-in">
+    <div class="applogo">日</div>
+    <div class="appbar-t">
+      <div class="apptitle">转播技术组日志</div>
+      <div class="appdate" id="todayText"></div>
+    </div>
+    <span class="chip" id="topChip">今日 0 条</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ 1 办公日志 ============ -->
+  <section class="page active" id="page-office">
+    <div class="page-head">
+      <h2>办公日志</h2>
+      <span class="sub">提交后自动记入当天</span>
+      <span class="count" id="cnt-office">今日 0 条</span>
+    </div>
+
+    <div class="card">
+      <div class="field">
+        <label class="lb" for="office-project">子项目 <em>*</em></label>
+        <select id="office-project"></select>
+      </div>
+      <div class="field">
+        <label class="lb" for="office-content">今日工作内容 <em>*</em></label>
+        <textarea id="office-content"></textarea>
+      </div>
+      <div class="field">
+        <label class="lb" for="office-plan">明日工作计划</label>
+        <textarea id="office-plan"></textarea>
+      </div>
+      <div class="field">
+        <label class="lb" for="office-issue">存在问题和需协调事项</label>
+        <textarea id="office-issue"></textarea>
+      </div>
+      <div class="field">
+        <label class="lb">照片 <span class="opt">可多张</span></label>
+        <div class="pbtns">
+          <button class="pbtn" data-pick="office-cam">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A2 2 0 0 1 5 6.5h1.6l1.2-2h8.4l1.2 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></svg>
+            拍照
+          </button>
+          <button class="pbtn ghost" data-pick="office-alb">从相册选择</button>
+        </div>
+        <input type="file" id="office-cam" accept="image/*" capture="environment" hidden>
+        <input type="file" id="office-alb" accept="image/*" multiple hidden>
+        <div class="thumbs" id="office-thumbs"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="row2 fill">
+        <button class="btn plain" data-reset="office">清空重填</button>
+        <button class="btn primary" id="office-submit">提交</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 施工日志 ============ -->
+  <section class="page" id="page-site">
+    <div class="page-head">
+      <h2>施工日志</h2>
+      <span class="sub">提交后自动记入当天</span>
+      <span class="count" id="cnt-site">今日 0 条</span>
+    </div>
+
+    <div class="card">
+      <div class="field">
+        <label class="lb" for="site-project">子项目 <em>*</em></label>
+        <select id="site-project"></select>
+      </div>
+      <div class="field">
+        <label class="lb" for="site-content">施工内容 <em>*</em></label>
+        <textarea id="site-content"></textarea>
+      </div>
+      <div class="field">
+        <label class="lb" for="site-issue">存在问题及处理措施</label>
+        <textarea id="site-issue"></textarea>
+      </div>
+      <div class="field">
+        <label class="lb" for="site-coord">需协调事项</label>
+        <textarea id="site-coord"></textarea>
+      </div>
+      <div class="field">
+        <label class="lb">现场照片 <span class="opt">可多张</span></label>
+        <div class="pbtns">
+          <button class="pbtn" data-pick="site-cam">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A2 2 0 0 1 5 6.5h1.6l1.2-2h8.4l1.2 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></svg>
+            拍照
+          </button>
+          <button class="pbtn ghost" data-pick="site-alb">从相册选择</button>
+        </div>
+        <input type="file" id="site-cam" accept="image/*" capture="environment" hidden>
+        <input type="file" id="site-alb" accept="image/*" multiple hidden>
+        <div class="thumbs" id="site-thumbs"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="row2 fill">
+        <button class="btn plain" data-reset="site">清空重填</button>
+        <button class="btn primary o" id="site-submit">提交</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 验收日志 ============ -->
+  <section class="page" id="page-accept">
+    <div class="page-head">
+      <h2>验收日志</h2>
+      <span class="sub">提交后自动记入当天</span>
+      <span class="count" id="cnt-accept">今日 0 条</span>
+    </div>
+
+    <div class="card">
+      <div class="field">
+        <label class="lb" for="accept-project">子项目 <em>*</em></label>
+        <select id="accept-project"></select>
+      </div>
+      <div class="field">
+        <label class="lb" for="accept-content">验收内容 <em>*</em></label>
+        <textarea id="accept-content"></textarea>
+      </div>
+      <div class="field">
+        <label class="lb" for="accept-result">验收结论 <em>*</em></label>
+        <select id="accept-result">
+          <option value="">请选择</option>
+          <option>合格</option>
+          <option>整改后合格</option>
+          <option>不合格</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lb" for="accept-issue">存在问题及处理措施</label>
+        <textarea id="accept-issue"></textarea>
+      </div>
+      <div class="field">
+        <label class="lb" for="accept-coord">需协调事项</label>
+        <textarea id="accept-coord"></textarea>
+      </div>
+      <div class="field">
+        <label class="lb">验收照片 <span class="opt">可多张</span></label>
+        <div class="pbtns">
+          <button class="pbtn" data-pick="accept-cam">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A2 2 0 0 1 5 6.5h1.6l1.2-2h8.4l1.2 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></svg>
+            拍照
+          </button>
+          <button class="pbtn ghost" data-pick="accept-alb">从相册选择</button>
+        </div>
+        <input type="file" id="accept-cam" accept="image/*" capture="environment" hidden>
+        <input type="file" id="accept-alb" accept="image/*" multiple hidden>
+        <div class="thumbs" id="accept-thumbs"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="row2 fill">
+        <button class="btn plain" data-reset="accept">清空重填</button>
+        <button class="btn primary g" id="accept-submit">提交</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 当日汇总 ============ -->
+  <!-- ============ 4 当日汇总 ============ -->
+  <section class="page" id="page-summary">
+    <div class="print-head" id="sum-printhead"></div>
+
+    <div class="page-head">
+      <h2>当日汇总</h2>
+      <span class="sub">默认前一天 · 可逐日切换</span>
+    </div>
+
+    <div class="datebar">
+      <button class="db-nav" id="sum-prev" type="button" aria-label="前一天">&lsaquo;</button>
+      <div class="db-mid">
+        <input type="date" id="sum-date">
+        <div class="db-wk" id="sum-wk"></div>
+      </div>
+      <button class="db-nav" id="sum-next" type="button" aria-label="后一天">&rsaquo;</button>
+      <button class="db-nav db-all" id="sum-all" type="button">全部</button>
+    </div>
+
+    <div class="sec-title office">办公日志</div>
+    <div id="sum-office"></div>
+
+    <div class="sec-title site">施工日志</div>
+    <div id="sum-site"></div>
+
+    <div class="sec-title accept">验收日志</div>
+    <div id="sum-accept"></div>
+
+    <div class="actions no-print">
+      <button class="btn primary" id="sum-print">导出 PDF</button>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabbar">
+  <button class="tab active" data-page="office">
+    <svg viewBox="0 0 24 24"><path d="M9 4h6v2.6H9z"/><path d="M9 5.3H7A1.7 1.7 0 0 0 5.3 7v12A1.7 1.7 0 0 0 7 20.7h10a1.7 1.7 0 0 0 1.7-1.7V7A1.7 1.7 0 0 0 17 5.3h-2"/><path d="M8.6 12h6.8M8.6 15.6h4.4"/></svg>
+    <span>办公日志</span>
+  </button>
+  <button class="tab" data-page="site">
+    <svg viewBox="0 0 24 24"><path d="M4.2 15.4a7.8 7.8 0 0 1 15.6 0"/><path d="M2.6 15.4h18.8v3.4H2.6z"/><path d="M12 7.6V4.2"/><path d="M9.6 4.2h4.8"/></svg>
+    <span>施工日志</span>
+  </button>
+  <button class="tab" data-page="accept">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M8.2 12.3l2.6 2.6 4.9-5.2"/></svg>
+    <span>验收日志</span>
+  </button>
+  <button class="tab" data-page="summary">
+    <svg viewBox="0 0 24 24"><path d="M3.5 20.4h17"/><path d="M6.8 20.4v-6.6"/><path d="M12 20.4V6.4"/><path d="M17.2 20.4v-9.6"/></svg>
+    <span>当日汇总</span>
+  </button>
+</nav>
+
+<div id="toast"></div>
+<div id="lightbox"><span class="close">×</span><img alt="预览"></div>
+
+<script>
+/* ===== 项目任务数据（来自《项目任务清单.xlsx》） ===== */
+var RAW = [{"p":"Mediabuddy项目","t":"需求调研与分析、运营管理端开发","s":"2026-08-01","e":"2026-09-21"},{"p":"Mediabuddy项目","t":"媒体中心前端开发、Work Buddy智能应用","s":"2026-08-23","e":"2026-09-25"},{"p":"Mediabuddy项目","t":"系统开发","s":"2026-09-08","e":"2026-10-14"},{"p":"Mediabuddy项目","t":"订单生成","s":"2026-09-12","e":"2026-09-17"},{"p":"Mediabuddy项目","t":"统一认证开发、接口联调与集成","s":"2026-09-22","e":"2026-09-30"},{"p":"Mediabuddy项目","t":"部署与预上线检查","s":"2026-09-22","e":"2026-10-19"},{"p":"Mediabuddy项目","t":"测试与安全","s":"2026-09-28","e":"2026-10-19"},{"p":"动力系统","t":"物流及通道计划准备","s":"2026-09-05","e":"2026-09-29"},{"p":"动力系统","t":"箱式变压器订货、进场就位安装","s":"2026-09-06","e":"2026-09-30"},{"p":"动力系统","t":"ATS、配电箱改造及补充采购生产落实计划","s":"2026-09-07","e":"2026-09-29"},{"p":"动力系统","t":"一级低压设备配电箱进场就位及安装","s":"2026-09-07","e":"2026-09-30"},{"p":"动力系统","t":"UPS设备户外使用改造及补充采购生产落实计划","s":"2026-09-07","e":"2026-10-15"},{"p":"动力系统","t":"设备舱进场安装、内部装修","s":"2026-09-10","e":"2026-09-25"},{"p":"动力系统","t":"电池就位安装","s":"2026-09-12","e":"2026-09-25"},{"p":"动力系统","t":"低压设备ATS、UPS、末端配电箱柜就位及安装","s":"2026-09-12","e":"2026-09-30"},{"p":"动力系统","t":"低压电缆安装、敷设、防护","s":"2026-09-14","e":"2026-09-23"},{"p":"动力系统","t":"10KV电缆桥架施工安装","s":"2026-09-15","e":"2026-09-29"},{"p":"动力系统","t":"低压电缆接入前测试并接入系统","s":"2026-09-20","e":"2026-09-30"},{"p":"动力系统","t":"安防消缺和改进计划","s":"2026-09-20","e":"2026-11-07"},{"p":"动力系统","t":"多轮迎检和改进计划","s":"2026-09-20","e":"2026-11-07"},{"p":"动力系统","t":"日常应急演练","s":"2026-09-20","e":"2026-11-07"},{"p":"动力系统","t":"10KV电缆进场施工安装","s":"2026-09-21","e":"2026-09-30"},{"p":"动力系统","t":"10KV箱变、10KV电缆预防性试验","s":"2026-09-22","e":"2026-09-26"},{"p":"动力系统","t":"中压系统连接及通电","s":"2026-09-24","e":"2026-09-30"},{"p":"动力系统","t":"测试系统电源应急操作时序控制逻辑","s":"2026-09-30","e":"2026-10-15"},{"p":"动力系统","t":"系统联合测试并分级通电（临时全场通电）","s":"2026-10-01","e":"2026-10-15"},{"p":"动力系统","t":"ATS、UPS等设备试验带载功能（实测加模拟负载试验）","s":"2026-10-01","e":"2026-10-15"},{"p":"动力系统","t":"系统压力测试试验","s":"2026-10-18","e":"2026-10-31"},{"p":"1号+2号新闻发布厅","t":"勘场设计、结构搭建、建筑声学测试","s":"2026-09-10","e":"2026-09-20"},{"p":"1号+2号新闻发布厅","t":"视讯EFP系统提前埋线","s":"2026-09-20","e":"2026-09-30"},{"p":"1号+2号新闻发布厅","t":"灯光+音响现场测试、方案调整","s":"2026-09-21","e":"2026-10-11"},{"p":"1号+2号新闻发布厅","t":"全部物料、设备入场、搭建","s":"2026-10-10","e":"2026-10-17"},{"p":"1号+2号新闻发布厅","t":"灯光+音响+视讯系统调试","s":"2026-10-16","e":"2026-10-19"},{"p":"1号+2号新闻发布厅","t":"舞台搭建修复、调整","s":"2026-10-18","e":"2026-10-19"},{"p":"公共素材采集","t":"采访线踏勘","s":"2026-09-10","e":"2026-10-31"},{"p":"公共素材采集","t":"智媒圳品系统集成","s":"2026-09-10","e":"2026-10-31"},{"p":"公共素材采集","t":"公共素材云平台设备集成+测试、5G传输设备系统集成+测试","s":"2026-10-12","e":"2026-10-19"},{"p":"1号常规演播室+XR演播室","t":"音响+视讯+灯光+舞美勘场","s":"2026-09-14","e":"2026-09-25"},{"p":"1号常规演播室+XR演播室","t":"音响+视讯+灯光+舞美搭建、系统搭建、XR屏幕进场","s":"2026-10-10","e":"2026-10-18"},{"p":"1号常规演播室+XR演播室","t":"系统联调","s":"2026-10-16","e":"2026-10-19"},{"p":"屏控系统集成与信号调度","t":"勘场","s":"2026-09-21","e":"2026-10-04"},{"p":"屏控系统集成与信号调度","t":"进场搭建","s":"2026-10-05","e":"2026-10-15"},{"p":"屏控系统集成与信号调度","t":"系统联调","s":"2026-10-16","e":"2026-10-19"},{"p":"综合布线","t":"现场测量定位","s":"2026-08-25","e":"2026-08-27"},{"p":"综合布线","t":"材料进场同步办理入库","s":"2026-08-25","e":"2026-08-28"},{"p":"综合布线","t":"配电箱定位安装","s":"2026-08-28","e":"2026-09-01"},{"p":"综合布线","t":"网线、电源线、光缆铺设","s":"2026-09-01","e":"2026-09-25"},{"p":"综合布线","t":"隔墙底盒安装","s":"2026-09-09","e":"2026-09-13"},{"p":"综合布线","t":"机房配线架理线架安装","s":"2026-09-23","e":"2026-09-29"},{"p":"综合布线","t":"地板开孔上线","s":"2026-09-25","e":"2026-09-29"},{"p":"综合布线","t":"网络跳线","s":"2026-09-26","e":"2026-10-03"},{"p":"综合布线","t":"AP安装","s":"2026-09-27","e":"2026-10-03"},{"p":"综合布线","t":"光纤熔接","s":"2026-09-29","e":"2026-10-01"},{"p":"综合布线","t":"标签打印制作","s":"2026-10-05","e":"2026-10-09"},{"p":"综合布线","t":"电源插座、网络面板，光纤面板安装","s":"2026-10-07","e":"2026-10-13"},{"p":"综合布线","t":"强弱电线缆测试","s":"2026-10-17","e":"2026-10-19"},{"p":"综合布线","t":"设备联调","s":"2026-10-17","e":"2026-10-19"},{"p":"总控及播出","t":"供货清单核对与调整","s":"2026-09-14","e":"2026-09-20"},{"p":"总控及播出","t":"甲方供货设备整理与检测（包括特殊接头的收集）","s":"2026-09-14","e":"2026-09-27"},{"p":"总控及播出","t":"播控流程核对","s":"2026-09-14","e":"2026-09-27"},{"p":"总控及播出","t":"电视墙支架安装方案落实与配件生产","s":"2026-09-14","e":"2026-09-30"},{"p":"总控及播出","t":"施工图纸核对与调整","s":"2026-09-14","e":"2026-10-04"},{"p":"总控及播出","t":"甲方提供的播控服务器和工作站的操作系统和基础软件安装（包括Moxa卡安装）","s":"2026-09-21","e":"2026-09-30"},{"p":"总控及播出","t":"总控前置规划筹备工作（电视墙画分布局设计、总控播出系统信号命名落实、总控矩阵10个矩阵面板输入输出按键规划、局域网IP地址规划）","s":"2026-09-21","e":"2026-10-04"},{"p":"总控及播出","t":"会场CTA机房与MCR之间提前布设16根网线","s":"2026-09-21","e":"2026-10-04"},{"p":"总控及播出","t":"甲方供货设备搬运至会场","s":"2026-09-28","e":"2026-10-01"},{"p":"总控及播出","t":"机柜厂家提供机柜螺丝螺母和托架","s":"2026-09-28","e":"2026-10-04"},{"p":"总控及播出","t":"播出与媒体系统调试","s":"2026-10-02","e":"2026-10-31"},{"p":"总控及播出","t":"CTA机房和MCR房设备安装、汇聚点机房设备安装","s":"2026-10-05","e":"2026-10-09"},{"p":"总控及播出","t":"电视墙安装","s":"2026-10-05","e":"2026-10-11"},{"p":"总控及播出","t":"乙方供货的设备与线材到货与搬运入库","s":"2026-10-05","e":"2026-10-20"},{"p":"总控及播出","t":"业务培训","s":"2026-10-05","e":"2026-11-10"},{"p":"总控及播出","t":"MCR电视墙通电点亮","s":"2026-10-10","e":"2026-10-11"},{"p":"总控及播出","t":"总控矩阵面板设置","s":"2026-10-10","e":"2026-10-11"},{"p":"总控及播出","t":"单机调试（同步机，时钟设备，播出延时器）","s":"2026-10-10","e":"2026-10-11"},{"p":"总控及播出","t":"CTA机房视音频线和控制线连接与绑扎","s":"2026-10-10","e":"2026-10-20"},{"p":"总控及播出","t":"单机调试（总控画分设备）","s":"2026-10-10","e":"2026-10-20"},{"p":"总控及播出","t":"MCR房视音频线和控制线连接与绑扎","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"CTA机房光端传输光纤线连接与绑扎","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"会场各区域点位视音频线和光纤线连接与绑扎","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"多芯控制线接头焊接","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"各房间电源线接入与绑扎","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"系统标签制作","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"总控矩阵调整和输入输出跳线通道检查","s":"2026-10-12","e":"2026-10-25"},{"p":"总控及播出","t":"单机调试（播出切换台，播出多选一，播出画分，12G视分和帧同步）","s":"2026-10-12","e":"2026-10-25"},{"p":"总控及播出","t":"单机调试（环路处理设备-SNP和X85）","s":"2026-10-12","e":"2026-10-31"},{"p":"总控及播出","t":"单机调试（SRT设备）","s":"2026-10-12","e":"2026-10-31"},{"p":"总控及播出","t":"光端传输设备调试与各区光传信号通路检查","s":"2026-10-21","e":"2026-10-25"},{"p":"总控及播出","t":"总控/播出/媒资系统联调和指标测试","s":"2026-10-26","e":"2026-10-26"},{"p":"总控及播出","t":"根据实际的应用场景调整各工位矩阵面板的按键布局","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"总控/播出/媒资系统功能验证","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"控/播出/媒资系统全流程演练","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"总控/播出/媒资系统稳定性与压力测试","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"故障模拟与应急演练","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"根据使用效果对系统进行微调和问题处理","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"正式运行与重点保障","s":"2026-11-11","e":"2026-11-20"},{"p":"总控及播出","t":"撤场","s":"2026-11-21","e":"2026-11-28"},{"p":"信息技术系统","t":"信息发布系统需求确认以及高保真交互原型输出","s":"2026-07-13","e":"2026-07-13"},{"p":"信息技术系统","t":"IBC系统需需求确认以及高保真交互原型输出","s":"2026-07-13","e":"2026-07-13"},{"p":"信息技术系统","t":"信息发布系统技术框架搭建","s":"2026-08-13","e":"2026-08-13"},{"p":"信息技术系统","t":"IBC系统web后台及记者端技术框架搭建","s":"2026-08-13","e":"2026-08-13"},{"p":"信息技术系统","t":"信息发布系统具体功能实现","s":"2026-08-25","e":"2026-08-25"},{"p":"信息技术系统","t":"IBC系统web后台及记者端具体功能实现","s":"2026-08-25","e":"2026-09-30"},{"p":"信息技术系统","t":"服务资源、预约流程、收费方案确定","s":"2026-09-07","e":"2026-09-20"},{"p":"信息技术系统","t":"UI视觉设计","s":"2026-09-30","e":"2026-09-30"},{"p":"信息技术系统","t":"信息发布系统和IBC系统视觉及细化需求调整","s":"2026-09-30","e":"2026-10-10"},{"p":"信息技术系统","t":"总控及播出频道安装集成","s":"2026-10-05","e":"2026-10-20"},{"p":"信息技术系统","t":"有线电视系统安装集成","s":"2026-10-05","e":"2026-10-20"},{"p":"信息技术系统","t":"信息系统硬件安装集成","s":"2026-10-08","e":"2026-10-20"},{"p":"信息技术系统","t":"运行管理系统功能测试、流程测试","s":"2026-10-11","e":"2026-10-20"},{"p":"信息技术系统","t":"LED大屏安装","s":"2026-10-20","e":"2026-10-20"},{"p":"信息技术系统","t":"多系统联调测试","s":"2026-10-21","e":"2026-10-21"},{"p":"信息技术系统","t":"会议发布系统上屏及功能测试","s":"2026-10-21","e":"2026-10-22"},{"p":"信息技术系统","t":"系统上线试运行","s":"2026-11-01","e":"2026-11-01"},{"p":"信息技术系统","t":"系统正式试运行","s":"2026-11-11","e":"2026-11-11"},{"p":"信息技术系统","t":"撤场","s":"2026-11-21","e":"2026-11-28"},{"p":"音频监听系统","t":"软件基础版本开发","s":"2026-09-21","e":"2026-09-29"},{"p":"音频监听系统","t":"发布厅音频布线","s":"2026-09-28","e":"2026-09-30"},{"p":"音频监听系统","t":"软件UI设计","s":"2026-09-30","e":"2026-10-20"},{"p":"音频监听系统","t":"CTA机房和MCR房设备安装集成","s":"2026-10-05","e":"2026-10-15"},{"p":"音频监听系统","t":"总控及播出频道安装集成","s":"2026-10-05","e":"2026-10-20"},{"p":"音频监听系统","t":"有线电视系统安装集成","s":"2026-10-05","e":"2026-10-20"},{"p":"音频监听系统","t":"系统网络设置","s":"2026-10-16","e":"2026-10-20"},{"p":"XR制作系统","t":"摇臂及跟踪系统培训","s":"2026-09-14","e":"2026-09-30"},{"p":"XR制作系统","t":"8楼XR设备清点、打包","s":"2026-09-18","e":"2026-10-07"},{"p":"XR制作系统","t":"XR场景开发","s":"2026-09-21","e":"2026-09-30"},{"p":"XR制作系统","t":"XR场景测试","s":"2026-10-01","e":"2026-10-20"},{"p":"XR制作系统","t":"演播室视音频、灯光设备安装集成","s":"2026-10-08","e":"2026-10-20"},{"p":"XR制作系统","t":"LED大屏拆卸","s":"2026-10-13","e":"2026-10-13"},{"p":"XR制作系统","t":"LED大屏安装","s":"2026-10-14","e":"2026-10-16"},{"p":"XR制作系统","t":"XR设备运输进场及安装","s":"2026-10-18","e":"2026-10-20"},{"p":"XR制作系统","t":"XR系统调试（跟踪、校色）","s":"2026-10-21","e":"2026-10-31"},{"p":"XR制作系统","t":"系统上线试运行","s":"2026-11-01","e":"2026-11-10"},{"p":"XR制作系统","t":"正式运行","s":"2026-11-11","e":"2026-11-21"},{"p":"XR制作系统","t":"撤场","s":"2026-11-21","e":"2026-11-28"},{"p":"XR制作系统","t":"设备清点","s":"2026-11-29","e":"2026-11-30"},{"p":"XR制作系统","t":"设备、系统复原","s":"2026-11-30","e":"2026-12-08"},{"p":"网络设备（华为）","t":"前期方案确认","s":"2026-09-10","e":"2026-09-24"},{"p":"网络设备（华为）","t":"进场与搭建","s":"2026-09-25","e":"2026-10-20"},{"p":"网络设备（华为）","t":"系统调试","s":"2026-10-08","e":"2026-11-10"},{"p":"联通出口带宽项目","t":"2.1光缆工程设计","s":"2026-09-10","e":"2026-09-13"},{"p":"联通出口带宽项目","t":"2.2传输设备工程设计","s":"2026-09-10","e":"2026-09-13"},{"p":"联通出口带宽项目","t":"1.1项目立项","s":"2026-09-10","e":"2026-09-18"},{"p":"联通出口带宽项目","t":"3.1方案编制并定稿","s":"2026-09-10","e":"2026-09-18"},{"p":"联通出口带宽项目","t":"2.3设备选型","s":"2026-09-11","e":"2026-09-11"},{"p":"联通出口带宽项目","t":"4.2.1市政管道报租","s":"2026-09-14","e":"2026-09-16"},{"p":"联通出口带宽项目","t":"4.2光缆工程","s":"2026-09-14","e":"2026-09-29"},{"p":"联通出口带宽项目","t":"4.3.1设备采购","s":"2026-09-15","e":"2026-10-08"},{"p":"联通出口带宽项目","t":"4.3传输设备工程","s":"2026-09-15","e":"2026-10-13"},{"p":"联通出口带宽项目","t":"2.4设计评审","s":"2026-09-16","e":"2026-09-16"},{"p":"联通出口带宽项目","t":"4.2.2光缆敷设","s":"2026-09-17","e":"2026-09-24"},{"p":"联通出口带宽项目","t":"6.1OOP工单流程审批","s":"2026-09-19","e":"2026-09-30"},{"p":"联通出口带宽项目","t":"4.2.3光缆成端","s":"2026-09-28","e":"2026-09-29"},{"p":"联通出口带宽项目","t":"4.3.2设备安装","s":"2026-10-08","e":"2026-10-11"},{"p":"联通出口带宽项目","t":"6.2联通盾服务开通","s":"2026-10-08","e":"2026-10-16"},{"p":"联通出口带宽项目","t":"4.3.3设备调试上载","s":"2026-10-12","e":"2026-10-13"},{"p":"联通出口带宽项目","t":"5.1传输资源配置","s":"2026-10-14","e":"2026-10-15"},{"p":"联通出口带宽项目","t":"5.2数据资源配置","s":"2026-10-14","e":"2026-10-15"},{"p":"联通出口带宽项目","t":"5.3语音资源配置","s":"2026-10-14","e":"2026-10-15"},{"p":"联通出口带宽项目","t":"5.4光路跳纤","s":"2026-10-16","e":"2026-10-16"},{"p":"联通出口带宽项目","t":"5.5开通联调测试","s":"2026-10-17","e":"2026-10-19"},{"p":"联通出口带宽项目","t":"7.1项目试运行","s":"2026-10-21","e":"2026-11-10"},{"p":"联通出口带宽项目","t":"8.1网络运行和重保","s":"2026-11-11","e":"2026-11-21"},{"p":"深信服网络安全项目","t":"赞助与设备投入决策确认","s":"2026-09-10","e":"2026-09-15"},{"p":"深信服网络安全项目","t":"现场勘探与设备材料清单核对","s":"2026-09-14","e":"2026-09-22"},{"p":"深信服网络安全项目","t":"入场合规报备与安全责任书签署","s":"2026-09-14","e":"2026-09-28"},{"p":"深信服网络安全项目","t":"客户网络规划获取+实施方案确认（IP划分/线路）","s":"2026-09-14","e":"2026-09-30"},{"p":"深信服网络安全项目","t":"设备分批到货计划确认","s":"2026-09-16","e":"2026-09-16"},{"p":"深信服网络安全项目","t":"首批设备到货（SIP/探针）","s":"2026-09-17","e":"2026-09-20"},{"p":"深信服网络安全项目","t":"第二批到货（行为管理/审计类/AD/防火墙）","s":"2026-09-20","e":"2026-09-30"},{"p":"深信服网络安全项目","t":"SaaS服务开通（EDR/MSS/XDR）","s":"2026-09-20","e":"2026-10-20"},{"p":"深信服网络安全项目","t":"设备到货验收与资产登记","s":"2026-09-21","e":"2026-09-30"},{"p":"深信服网络安全项目","t":"设备上架与线缆敷设（主馆）","s":"2026-10-08","e":"2026-10-15"},{"p":"深信服网络安全项目","t":"防火墙单机加电与基础配置","s":"2026-10-16","e":"2026-10-20"},{"p":"深信服网络安全项目","t":"探针部署与镜像流量接入","s":"2026-10-16","e":"2026-10-22"},{"p":"深信服网络安全项目","t":"审计类设备部署（日审/数审/堡垒机）","s":"2026-10-16","e":"2026-10-25"},{"p":"深信服网络安全项目","t":"与华三/电信出口联调","s":"2026-10-21","e":"2026-10-25"},{"p":"深信服网络安全项目","t":"AC与派网单点对接（审计留痕）","s":"2026-10-21","e":"2026-10-28"},{"p":"深信服网络安全项目","t":"安全策略配置与优化","s":"2026-10-22","e":"2026-10-30"},{"p":"深信服网络安全项目","t":"5号馆进场与上架","s":"2026-10-26","e":"2026-10-28"},{"p":"深信服网络安全项目","t":"5号馆调试与联调","s":"2026-10-29","e":"2026-10-31"},{"p":"深信服网络安全项目","t":"大流量性能验证（不成为瓶颈）","s":"2026-10-31","e":"2026-11-01"},{"p":"深信服网络安全项目","t":"安全测试与测试报告出具","s":"2026-10-31","e":"2026-11-07"},{"p":"深信服网络安全项目","t":"系统全流程联调与试运行","s":"2026-11-02","e":"2026-11-10"}];
+
+var PROJECTS = [], TASKS = {};
+RAW.forEach(function(r){
+  if(!TASKS[r.p]){ TASKS[r.p] = []; PROJECTS.push(r.p); }
+  TASKS[r.p].push({name:r.t, s:r.s, e:r.e});
+});
+
+/* ===== 存储 ===== */
+var LS_KEY = 'xinwen_logbook_v1';
+function loadAll(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || []; }catch(e){ return []; } }
+function saveAll(l){ try{ localStorage.setItem(LS_KEY, JSON.stringify(l)); return true; }
+  catch(e){ toast('本地存储已满，请先导出或删除旧记录'); return false; } }
+/* ===== 腾讯云 COS 存储（与“节目制作资源”系统共用同一 Bucket） ===== */
+var LOG_COS_CONFIG = {
+  secretId: atob('QUtJRGhtYVE2YXJ1bERWVUl1TFlZUjZZZ2JKcEFJRzFhdzYz'),
+  secretKey: atob('bVZBakFUeEtaaGhjUDVuT3JDUmFiVkl6WHhHVWFZUDg='),
+  bucket: 'form-' + atob('MTQ0NjA1MzM1Nw=='),
+  region: atob('YXAtZ3Vhbmd6aG91')
+};
+var LOG_KEY = 'data/logbook/latest.json';
+var logCosClient = null;
+var LS_DELETED_KEY = LS_KEY + '_deleted';
+function getLogCos(){
+  if(!window.COS) return null;
+  if(!logCosClient){
+    logCosClient = new COS({ SecretId: LOG_COS_CONFIG.secretId, SecretKey: LOG_COS_CONFIG.secretKey });
+  }
+  return logCosClient;
+}
+function loadDeletedIds(){ try{ return JSON.parse(localStorage.getItem(LS_DELETED_KEY)) || []; }catch(e){ return []; } }
+function saveDeletedIds(arr){ try{ localStorage.setItem(LS_DELETED_KEY, JSON.stringify(arr)); return true; }catch(e){ return false; } }
+function uniqueIds(arr){
+  var seen = {}, out = [];
+  (arr || []).forEach(function(id){ if(id && !seen[id]){ seen[id] = 1; out.push(id); } });
+  return out;
+}
+function cosBodyToString(body){
+  if(typeof body === 'string') return body;
+  if(body instanceof ArrayBuffer) return new TextDecoder('utf-8').decode(body);
+  if(body && body.Buffer) return new TextDecoder('utf-8').decode(body.Buffer);
+  if(body && typeof body.toString === 'function') return body.toString();
+  return '';
+}
+function loadLogbookFromCOS(cb){
+  var client = getLogCos();
+  if(!client){ cb(null); return; }
+  client.getObject({ Bucket: LOG_COS_CONFIG.bucket, Region: LOG_COS_CONFIG.region, Key: LOG_KEY }, function(err, data){
+    if(err){ cb(null); return; }
+    try{
+      var parsed = JSON.parse(cosBodyToString(data.Body));
+      var logs = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.logs) ? parsed.logs : []);
+      var deletedIds = Array.isArray(parsed.deletedIds) ? parsed.deletedIds : [];
+      cb({ logs: logs, deletedIds: deletedIds });
+    }catch(e){ cb(null); }
+  });
+}
+function saveLogbookToCOS(snapshot, done){
+  var client = getLogCos();
+  if(!client){ if(done) done(false); return; }
+  var payload = { logs: snapshot.logs || [], deletedIds: snapshot.deletedIds || [], backupTime: new Date().toISOString() };
+  var body = JSON.stringify(payload, null, 2);
+  client.putObject({ Bucket: LOG_COS_CONFIG.bucket, Region: LOG_COS_CONFIG.region, Key: LOG_KEY, Body: body, ContentType: 'application/json; charset=utf-8' }, function(err){
+    if(err){ if(done) done(false); return; }
+    var now = new Date();
+    var dateStr = now.toISOString().split('T')[0];
+    var timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '');
+    client.putObject({
+      Bucket: LOG_COS_CONFIG.bucket,
+      Region: LOG_COS_CONFIG.region,
+      Key: 'data/logbook/history/' + dateStr + '_' + timeStr + '.json',
+      Body: body,
+      ContentType: 'application/json; charset=utf-8'
+    }, function(){ if(done) done(true); });
+  });
+}
+function sortLogs(list){
+  return (list || []).slice().sort(function(a, b){
+    var ta = String(a.createdAt || ''), tb = String(b.createdAt || '');
+    if(ta !== tb) return ta.localeCompare(tb);
+    return String(a.id).localeCompare(String(b.id));
+  });
+}
+function sameLogs(a, b){
+  return JSON.stringify(sortLogs(a)) === JSON.stringify(sortLogs(b));
+}
+function sortIds(arr){ return (arr || []).slice().sort(); }
+function sameIds(a, b){ return JSON.stringify(sortIds(a)) === JSON.stringify(sortIds(b)); }
+function mergeById(a, b){
+  var map = {};
+  (a || []).concat(b || []).forEach(function(r){ if(r && r.id) map[r.id] = r; });
+  return Object.keys(map).map(function(k){ return map[k]; });
+}
+function syncLogbook(removeId, done){
+  var local = loadAll();
+  var localDeleted = loadDeletedIds();
+  loadLogbookFromCOS(function(snap){
+    var cloud = snap ? snap.logs : [];
+    var cloudDeleted = snap ? snap.deletedIds : [];
+    var deleted = uniqueIds(localDeleted.concat(cloudDeleted).concat(removeId ? [removeId] : []));
+    var merged = mergeById(local, cloud).filter(function(r){ return deleted.indexOf(r.id) === -1; });
+    var localLogsChanged = !sameLogs(merged, local);
+    var localDeletedChanged = !sameIds(deleted, localDeleted);
+    var cloudLogsChanged = !sameLogs(merged, cloud);
+    var cloudDeletedChanged = !sameIds(deleted, cloudDeleted);
+    if(localLogsChanged) saveAll(merged);
+    if(localDeletedChanged) saveDeletedIds(deleted);
+    if(cloudLogsChanged || cloudDeletedChanged){
+      saveLogbookToCOS({ logs: merged, deletedIds: deleted }, function(ok){
+        refreshCounts(); renderSummary();
+        if(done) done(ok);
+      });
+    } else {
+      if(localLogsChanged || localDeletedChanged){ refreshCounts(); renderSummary(); }
+      if(done) done(true);
+    }
+  });
+}
+function pad(n){ return String(n).padStart(2,'0'); }
+function isoOf(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function today(){ return isoOf(new Date()); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+var tTimer;
+function toast(msg){
+  var el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(tTimer); tTimer=setTimeout(function(){ el.classList.remove('show'); }, 2600);
+}
+
+/* ===== 日志类型配置 ===== */
+var CFG = {
+  office: { label:'办公日志', fields:[['content','今日工作内容'],['plan','明日工作计划'],['issue','存在问题和需协调事项']], photos:true, photoLabel:'照片' },
+  site:   { label:'施工日志', fields:[['content','施工内容'],['issue','存在问题及处理措施'],['coord','需协调事项']], photos:true, photoLabel:'现场照片' },
+  accept: { label:'验收日志', fields:[['content','验收内容'],['result','验收结论'],['issue','存在问题及处理措施'],['coord','需协调事项']], photos:true, photoLabel:'验收照片' }
+};
+var PHOTOS = { office:[], site:[], accept:[] };
+
+/* ===== 子项目 ===== */
+function fillProjects(sel){
+  sel.innerHTML = '<option value="">请选择子项目</option>' +
+    PROJECTS.map(function(p){ return '<option value="'+esc(p)+'">'+esc(p)+'</option>'; }).join('');
+}
+['office','site','accept'].forEach(function(type){
+  fillProjects(document.getElementById(type+'-project'));
+});
+
+/* ===== 照片 ===== */
+function compress(file, maxW, q, cb){
+  maxW = maxW || 1400; q = q || 0.72;
+  var fr = new FileReader();
+  fr.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      var w = img.width, h = img.height;
+      if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+      var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      var ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h);
+      ctx.drawImage(img,0,0,w,h);
+      cb(cv.toDataURL('image/jpeg', q));
+    };
+    img.onerror = function(){ cb(null); };
+    img.src = fr.result;
+  };
+  fr.onerror = function(){ cb(null); };
+  fr.readAsDataURL(file);
+}
+function addFiles(type, files){
+  var arr = Array.prototype.slice.call(files).filter(function(f){ return /^image\//.test(f.type); });
+  if(!arr.length) return;
+  var pending = arr.length;
+  arr.forEach(function(f){
+    compress(f, 1400, 0.72, function(url){
+      if(url) PHOTOS[type].push({ name:f.name, data:url });
+      if(--pending === 0){ renderThumbs(type); toast('已添加 '+arr.length+' 张照片'); }
+    });
+  });
+}
+function renderThumbs(type){
+  var box = document.getElementById(type+'-thumbs');
+  box.innerHTML = PHOTOS[type].map(function(p,i){
+    return '<div class="thumb"><img src="'+p.data+'" alt=""><span class="no">'+(i+1)+'</span><span class="del" data-t="'+type+'" data-i="'+i+'">×</span></div>';
+  }).join('');
+}
+function dataURLtoBlob(dataUrl){
+  var parts = String(dataUrl).split(',');
+  var mime = 'image/jpeg';
+  var head = parts[0] || '';
+  if(head.indexOf(':') > -1 && head.indexOf(';') > -1){ mime = head.slice(head.indexOf(':')+1, head.indexOf(';')); }
+  var bstr = atob(parts[1]);
+  var n = bstr.length;
+  var u8 = new Uint8Array(n);
+  for(var i=0;i<n;i++){ u8[i] = bstr.charCodeAt(i); }
+  return new Blob([u8], { type: mime });
+}
+function uploadPhoto(pid, dataUrl, name, cb){
+  var client = getLogCos();
+  if(!client){ cb(new Error('cos-unavailable')); return; }
+  var key = 'data/logbook/photos/' + pid + '.jpg';
+  client.putObject({ Bucket: LOG_COS_CONFIG.bucket, Region: LOG_COS_CONFIG.region, Key: key, Body: dataURLtoBlob(dataUrl), ContentType: 'image/jpeg' }, function(err){
+    if(err){ cb(err); return; }
+    cb(null, { id: pid, key: key, name: name || '' });
+  });
+}
+function deletePhoto(key){
+  var client = getLogCos();
+  if(!client || !key) return;
+  client.deleteObject({ Bucket: LOG_COS_CONFIG.bucket, Region: LOG_COS_CONFIG.region, Key: key }, function(){});
+}
+function bodyToBlob(body){
+  if(!body) return null;
+  if(typeof Blob !== 'undefined' && body instanceof Blob) return body;
+  if(body instanceof ArrayBuffer) return new Blob([body]);
+  if(body.Buffer) return new Blob([body.Buffer]);
+  if(typeof body === 'string') return new Blob([body], { type: 'image/jpeg' });
+  return null;
+}
+function loadLogImages(root){
+  var imgs = (root || document).querySelectorAll('img.log-photo[data-key]');
+  Array.prototype.forEach.call(imgs, function(img){
+    var key = img.getAttribute('data-key');
+    var client = getLogCos();
+    if(!client){ img.alt = '照片'; return; }
+    client.getObject({ Bucket: LOG_COS_CONFIG.bucket, Region: LOG_COS_CONFIG.region, Key: key, DataType: 'arraybuffer' }, function(err, data){
+      if(err || !data){ img.alt = '照片加载失败'; return; }
+      var blob = bodyToBlob(data.Body);
+      if(!blob){ img.alt = '照片加载失败'; return; }
+      img.src = URL.createObjectURL(blob);
+      img.onload = function(){ img.classList.add('loaded'); };
+    });
+  });
+}
+document.querySelectorAll('[data-pick]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var id = btn.dataset.pick;
+    document.getElementById(id).click();
+  });
+});
+['office-cam','office-alb','site-cam','site-alb','accept-cam','accept-alb'].forEach(function(id){
+  var type = id.split('-')[0];
+  document.getElementById(id).addEventListener('change', function(){
+    addFiles(type, this.files);
+    this.value = '';
+  });
+});
+document.addEventListener('click', function(e){
+  var del = e.target.closest('.thumb .del');
+  if(del){
+    PHOTOS[del.dataset.t].splice(Number(del.dataset.i), 1);
+    renderThumbs(del.dataset.t);
+    return;
+  }
+  var img = e.target.closest('.thumb img, .kv .v.photos img');
+  if(img){
+    if(img.getAttribute('data-key') && !img.getAttribute('src')) return;
+    openLightbox(img.src);
+  }
+});
+
+/* ===== 提交 ===== */
+function submitLog(type){
+  var cfg = CFG[type];
+  var project = document.getElementById(type+'-project').value;
+  if(!project) return toast('请选择子项目');
+
+  var data = {};
+  for(var i=0;i<cfg.fields.length;i++){
+    var key = cfg.fields[i][0], label = cfg.fields[i][1];
+    var v = (document.getElementById(type+'-'+key).value || '').trim();
+    var required = (key === 'content' || (type === 'accept' && key === 'result'));
+    if(required && !v) return toast('请填写「'+label+'」');
+    if(v) data[label] = v;
+  }
+
+  var photos = cfg.photos ? PHOTOS[type].slice() : [];
+  if(!photos.length){ finalizeSubmit(type, cfg, project, data, []); return; }
+
+  var remaining = photos.length;
+  var failed = false;
+  var refs = new Array(photos.length);
+  photos.forEach(function(p, idx){
+    var pid = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,9);
+    uploadPhoto(pid, p.data, p.name, function(err, ref){
+      if(err){ failed = true; }
+      else { refs[idx] = ref; }
+      if(--remaining === 0){
+        var ordered = refs.filter(Boolean);
+        if(failed){
+          ordered.forEach(function(r){ deletePhoto(r.key); });
+          toast('照片上传失败，请检查网络后重试');
+        } else {
+          finalizeSubmit(type, cfg, project, data, ordered);
+        }
+      }
+    });
+  });
+}
+function finalizeSubmit(type, cfg, project, data, photos){
+  var list = loadAll();
+  list.push({
+    id: type.charAt(0) + Date.now() + Math.random().toString(36).slice(2,6),
+    type: type,
+    date: today(),
+    project: project,
+    task: '',
+    data: data,
+    photos: photos,
+    createdAt: new Date().toISOString()
+  });
+  if(!saveAll(list)) return;
+  var n = photos.length;
+  resetForm(type, true);
+  toast(cfg.label + '已提交' + (n ? '，含 ' + n + ' 张照片' : ''));
+  refreshCounts();
+  renderSummary();
+  syncLogbook(null, function(ok){ if(!ok) toast('已提交到本机，云端同步失败'); });
+}
+['office','site','accept'].forEach(function(type){
+  document.getElementById(type+'-submit').addEventListener('click', function(){ submitLog(type); });
+});
+function resetForm(type, keepProject){
+  CFG[type].fields.forEach(function(f){
+    var el = document.getElementById(type+'-'+f[0]);
+    el.value = '';
+  });
+  if(CFG[type].photos){ PHOTOS[type] = []; renderThumbs(type); }
+  if(!keepProject){
+    document.getElementById(type+'-project').value = '';
+  }
+}
+document.querySelectorAll('[data-reset]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var t = btn.dataset.reset;
+    resetForm(t, false);
+    toast('已清空');
+  });
+});
+
+/* ===== 导航 ===== */
+function goto(page){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.toggle('active', p.id === 'page-'+page); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.page === page); });
+  if(page === 'summary') renderSummary();
+  refreshCounts();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){ goto(t.dataset.page); });
+});
+document.querySelectorAll('[data-goto]').forEach(function(b){
+  b.addEventListener('click', function(){ goto(b.dataset.goto); });
+});
+
+/* ===== 计数 ===== */
+function refreshCounts(){
+  var all = loadAll(), d = today();
+  var n = { office:0, site:0, accept:0 };
+  all.forEach(function(r){ if(r.date === d && n[r.type] !== undefined) n[r.type]++; });
+  var total = n.office + n.site + n.accept;
+  document.getElementById('cnt-office').textContent = '今日 ' + n.office + ' 条';
+  document.getElementById('cnt-site').textContent   = '今日 ' + n.site + ' 条';
+  document.getElementById('cnt-accept').textContent = '今日 ' + n.accept + ' 条';
+  document.getElementById('topChip').textContent    = '今日 ' + total + ' 条';
+}
+
+/* ===== 汇总 ===== */
+var sumDate = document.getElementById('sum-date');
+var sumWk   = document.getElementById('sum-wk');
+var sumHead = document.getElementById('sum-printhead');
+var sumPrev = document.getElementById('sum-prev');
+var sumNext = document.getElementById('sum-next');
+var sumAll = document.getElementById('sum-all');
+var sumAllMode = false;
+var WEEK_CN = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+
+function dateFromYmd(v){
+  var a = String(v || '').split('-');
+  return new Date(Number(a[0]), Number(a[1]) - 1, Number(a[2]));
+}
+function shiftYmd(v, n){
+  var d = dateFromYmd(v);
+  if(isNaN(d.getTime())) d = new Date();
+  d.setDate(d.getDate() + n);
+  return isoOf(d);
+}
+function weekOf(v){ return WEEK_CN[dateFromYmd(v).getDay()]; }
+function projRank(p){ var i = PROJECTS.indexOf(p); return i < 0 ? 999 : i; }
+function rankSort(a, b){ return projRank(a) - projRank(b); }
+function byTime(a, b){ return String(a.createdAt || '').localeCompare(String(b.createdAt || '')); }
+function hhmm(v){
+  var d = new Date(v);
+  if(isNaN(d.getTime())) return '';
+  return pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+/* 汇总日期默认显示前一天 */
+sumDate.value = shiftYmd(today(), -1);
+sumDate.addEventListener('change', function(){ if(!sumAllMode) renderSummary(); });
+sumPrev.addEventListener('click', function(){
+  if(sumAllMode) return;
+  sumDate.value = shiftYmd(sumDate.value || today(), -1);
+  renderSummary();
+});
+sumNext.addEventListener('click', function(){
+  if(sumAllMode || sumNext.disabled) return;
+  sumDate.value = shiftYmd(sumDate.value || today(), 1);
+  renderSummary();
+});
+sumAll.addEventListener('click', function(){
+  sumAllMode = !sumAllMode;
+  sumAll.classList.toggle('active', sumAllMode);
+  renderSummary();
+});
+
+function photoLabel(t){ return (CFG[t] && CFG[t].photoLabel) || '照片'; }
+
+function renderSummary(){
+  var allMode = sumAllMode;
+  var items;
+  if(allMode){
+    sumDate.disabled = true;
+    sumPrev.disabled = true;
+    sumNext.disabled = true;
+    sumWk.textContent = '全部日志';
+    sumHead.textContent = '转播技术组日志 · 全部日志';
+    items = loadAll();
+  } else {
+    sumDate.disabled = false;
+    sumPrev.disabled = false;
+    var d = sumDate.value || shiftYmd(today(), -1);
+    sumDate.value = d;
+    var rel = d === today() ? ' · 今天' : (d === shiftYmd(today(), -1) ? ' · 前一天' : '');
+    sumWk.textContent = d + ' ' + weekOf(d) + rel;
+    sumNext.disabled = (d >= today());
+    sumHead.textContent = '转播技术组日志 · 当日汇总　' + d + ' ' + weekOf(d);
+    items = loadAll().filter(function(r){ return r.date === d; });
+  }
+  fillSection('sum-office', 'office', items, allMode);
+  fillSection('sum-site',   'site',   items, allMode);
+  fillSection('sum-accept', 'accept', items, allMode);
+  loadLogImages();
+}
+
+/* 一个区块：按子项目拆分成方框 */
+function fillSection(elId, type, items, allMode){
+  var el = document.getElementById(elId);
+  var list = items.filter(function(r){ return r.type === type; });
+  if(!list.length){
+    el.innerHTML = '<div class="empty small">' + (allMode ? '暂无记录' : (sumDate.value || '') + ' 暂无记录') + '</div>';
+    return;
+  }
+  var g = {};
+  list.forEach(function(r){ (g[r.project] = g[r.project] || []).push(r); });
+  var html = '';
+  Object.keys(g).sort(rankSort).forEach(function(p){
+    html += projBox(p, type, g[p], allMode);
+  });
+  el.innerHTML = html;
+}
+
+function projBox(project, type, list, allMode){
+  var h = '<div class="pbox t-' + type + '"><div class="pbox-hd"><span class="pn">' + esc(project) + '</span></div>' +
+          '<div class="pbox-bd">';
+  var sorted = list.slice();
+  if(allMode){ sorted.sort(function(a,b){ return String(b.createdAt || '').localeCompare(String(a.createdAt || '')); }); }
+  else { sorted.sort(byTime); }
+  sorted.forEach(function(r){ h += entHtml(r, allMode); });
+  return h + '</div></div>';
+}
+
+function entHtml(r, showDate){
+  var head = (showDate ? esc(r.date) + ' ' : '') + esc(r.task || (hhmm(r.createdAt) + ' 提交'));
+  var h = '<div class="ent"><div class="ent-hd"><div class="tk">' + head + '</div>' +
+          '<button class="del no-print" data-del="' + r.id + '">删除</button></div>';
+  Object.keys(r.data || {}).forEach(function(k){
+    var v = r.data[k];
+    if(v === '' || v == null) return;
+    h += '<div class="kv"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v) + '</div></div>';
+  });
+  if(r.photos && r.photos.length){
+    h += '<div class="kv"><div class="k">' + esc(photoLabel(r.type)) + '</div><div class="v photos">' +
+         r.photos.map(function(p,j){
+           if(p.key) return '<img class="log-photo" data-key="' + esc(p.key) + '" alt="照片' + (j+1) + '">';
+           if(p.data) return '<img src="' + p.data + '" alt="照片' + (j+1) + '">';
+           return '';
+         }).join('') +
+         '</div></div>';
+  }
+  return h + '</div>';
+}
+
+['sum-office','sum-site','sum-accept'].forEach(function(id){
+  document.getElementById(id).addEventListener('click', function(e){
+    var del = e.target.closest('[data-del]');
+    if(!del) return;
+    if(!confirm('确认删除这条日志？')) return;
+    var delId = del.dataset.del;
+    var all = loadAll();
+    var target = null;
+    for(var i=0;i<all.length;i++){ if(all[i].id === delId){ target = all[i]; break; } }
+    saveAll(all.filter(function(r){ return r.id !== delId; }));
+    saveDeletedIds(uniqueIds(loadDeletedIds().concat([delId])));
+    renderSummary(); refreshCounts(); toast('已删除');
+    syncLogbook(delId, function(ok){
+      if(ok){
+        if(target && target.photos && target.photos.length){
+          target.photos.forEach(function(p){ if(p && p.key) deletePhoto(p.key); });
+        }
+      } else {
+        toast('已在本机删除，云端同步失败');
+      }
+    });
+  });
+});
+
+/* ===== 导出 PDF ===== */
+document.getElementById('sum-print').addEventListener('click', function(){ window.print(); });
+
+/* ===== 灯箱 ===== */
+function openLightbox(src){
+  var lb = document.getElementById('lightbox');
+  lb.querySelector('img').src = src; lb.classList.add('show');
+}
+document.getElementById('lightbox').addEventListener('click', function(){ this.classList.remove('show'); });
+
+/* ===== 启动 ===== */
+(function(){
+  var d = new Date();
+  var w = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
+  document.getElementById('todayText').textContent =
+    (d.getMonth()+1) + '月' + d.getDate() + '日 ' + w;
+  refreshCounts();
+  renderSummary();
+  syncLogbook();
+})();
+</script>
+</body>
+</html>
