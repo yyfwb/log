@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a6dff">
 <meta name="format-detection" content="telephone=no">
 <title>转播技术组日志</title>
@@ -85,6 +85,8 @@ select{
   background-repeat:no-repeat;background-position:right 12px center;background-size:18px;padding-right:38px;
 }
 textarea{resize:vertical;min-height:104px;line-height:1.65;padding-top:12px;font-size:16px;}
+#office-content,#site-content,#accept-content{min-height:208px;}
+#office-plan,#office-issue,#site-issue,#site-coord,#accept-issue,#accept-coord{min-height:70px;}
 input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,109,255,.11);}
 select:disabled{color:var(--txt3);background-color:#f5f7fa;}
 
@@ -630,7 +632,8 @@ var PHOTOS = { office:[], site:[], accept:[] };
 /* ===== 子项目 ===== */
 function fillProjects(sel){
   sel.innerHTML = '<option value="">请选择子项目</option>' +
-    PROJECTS.map(function(p){ return '<option value="'+esc(p)+'">'+esc(p)+'</option>'; }).join('');
+    PROJECTS.map(function(p){ return '<option value="'+esc(p)+'">'+esc(p)+'</option>'; }).join('') +
+    '<option value="其他">其他</option>';
 }
 ['office','site','accept'].forEach(function(type){
   fillProjects(document.getElementById(type+'-project'));
