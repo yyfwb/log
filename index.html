@@ -26,6 +26,23 @@ body{
   font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
   padding-bottom:calc(var(--tabbar) + env(safe-area-inset-bottom) + 8px);
 }
+/* ============ 登录遮罩 ============ */
+#gate{position:fixed;inset:0;z-index:9999;background:#16202f;display:flex;align-items:center;justify-content:center;padding:24px;}
+.gate-card{width:100%;max-width:320px;text-align:center;color:#fff;}
+.gate-title{font-size:18px;font-weight:600;letter-spacing:.5px;margin-bottom:4px;}
+.gate-sub{font-size:12.5px;color:rgba(255,255,255,.45);margin-bottom:22px;}
+.gate-card input[type=password]{width:100%;height:46px;border:none;border-radius:12px;background:rgba(255,255,255,.08);
+  color:#fff;font-size:16px;text-align:center;letter-spacing:4px;outline:none;margin-bottom:14px;}
+.gate-card input[type=password]::placeholder{color:rgba(255,255,255,.35);letter-spacing:1px;}
+.gate-card input[type=password]:focus{background:rgba(255,255,255,.14);}
+.gate-btn{width:100%;height:46px;border:none;border-radius:12px;background:linear-gradient(135deg,#1a6dff,#3f8dff);
+  color:#fff;font-size:15px;font-weight:600;letter-spacing:2px;}
+.gate-btn:active{opacity:.85;}
+.gate-err{min-height:18px;font-size:12px;color:#ff7b72;margin-top:10px;opacity:0;transition:opacity .15s;}
+.gate-err.show{opacity:1;}
+.gate-card.shake{animation:gateShake .4s;}
+@keyframes gateShake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+
 h1,h2,h3{margin:0;font-weight:600;}
 button,input,select,textarea{font-family:inherit;color:inherit;}
 button{cursor:pointer;border:none;background:none;font-size:15px;}
@@ -61,8 +78,16 @@ main{max-width:760px;margin:0 auto;padding:10px 16px 8px;}
 .page-head{display:flex;align-items:baseline;gap:9px;margin:2px 2px 9px;}
 .page-head h2{font-size:16px;}
 .page-head .sub{font-size:12.5px;color:var(--txt3);}
-.count{margin-left:auto;font-size:12px;color:var(--txt2);background:#fff;
+.sum-title-date{margin-left:auto;font-size:12.5px;color:var(--txt2);font-weight:600;white-space:nowrap;}
+.count{margin-left:0;font-size:12px;color:var(--txt2);background:#fff;
   border:1px solid var(--line);padding:3px 10px;border-radius:20px;white-space:nowrap;}
+.yday{margin-left:auto;font-size:12px;color:var(--txt2);background:#fff;border:1px solid var(--line);
+  padding:3px 10px;border-radius:20px;white-space:nowrap;cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:5px;}
+.yday input{display:none;}
+.yday .dot{width:10px;height:10px;border:1.5px solid var(--txt3);border-radius:3px;flex:none;position:relative;}
+.yday.on{color:#b35c00;background:var(--orange-bg);border-color:#f0c68a;font-weight:600;}
+.yday.on .dot{background:var(--orange);border-color:var(--orange);}
+.yday.on .dot::after{content:'';position:absolute;left:2.5px;top:0;width:3px;height:6px;border:solid #fff;border-width:0 1.5px 1.5px 0;transform:rotate(45deg);}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
   padding:14px;margin-bottom:12px;box-shadow:0 1px 2px rgba(22,32,47,.03);}
@@ -89,6 +114,7 @@ textarea{resize:vertical;min-height:104px;line-height:1.65;padding-top:12px;font
 #office-plan,#office-issue,#site-issue,#site-coord,#accept-issue,#accept-coord{min-height:70px;}
 input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,109,255,.11);}
 select:disabled{color:var(--txt3);background-color:#f5f7fa;}
+.project-custom{margin-top:8px;}
 
 .taskinfo{
   margin-top:8px;font-size:12.5px;color:var(--txt2);background:#f5f8fd;
@@ -212,6 +238,18 @@ tr.total td{background:#f7f9fd;font-weight:600;}
 #lightbox img{max-width:100%;max-height:82vh;border-radius:10px;}
 #lightbox .close{position:absolute;top:calc(18px + env(safe-area-inset-top));right:20px;color:#fff;font-size:30px;line-height:1;opacity:.85;}
 
+/* ============ 删除确认弹框 ============ */
+#confirm-box{position:fixed;inset:0;background:rgba(10,17,29,.45);display:none;align-items:center;justify-content:center;z-index:120;padding:24px;}
+#confirm-box.show{display:flex;}
+.cb-inner{background:#fff;border-radius:16px;width:100%;max-width:320px;padding:22px 20px 18px;box-shadow:0 20px 50px -12px rgba(0,0,0,.35);text-align:center;}
+.cb-msg{font-size:15.5px;color:var(--txt);font-weight:600;margin-bottom:20px;line-height:1.5;}
+.cb-btns{display:flex;gap:10px;}
+.cb-btn{flex:1;height:44px;border-radius:11px;font-size:15px;font-weight:600;border:none;cursor:pointer;}
+.cb-ok{background:var(--red);color:#fff;}
+.cb-ok:active{background:#c73a32;}
+.cb-cancel{background:#f1f5fb;color:var(--txt2);}
+.cb-cancel:active{background:#e4eaf3;}
+
 /* ============ 汇总：日期导航 ============ */
 .print-head{display:none;}
 .datebar{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
@@ -219,8 +257,6 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;transition:.15s;}
 .db-nav:active{background:var(--blue-bg);color:var(--blue);}
 .db-nav:disabled{opacity:.32;}
-.db-all{width:auto;padding:0 12px;font-size:13px;font-weight:600;color:var(--txt2);}
-.db-all.active{color:var(--blue);background:var(--blue-bg);}
 .db-mid{flex:1;text-align:center;min-width:0;}
 .db-mid input[type=date]{width:100%;border:none;background:transparent;text-align:center;
   font-size:17px;font-weight:600;color:var(--txt);padding:2px 0;font-family:inherit;}
@@ -242,8 +278,8 @@ tr.total td{background:#f7f9fd;font-weight:600;}
 .pbox-bd .pg-hd:first-child + .ent,.pbox-bd > .ent:first-child{border-top:none;}
 .ent-hd{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;}
 .ent-hd .tk{flex:1;font-size:13.5px;font-weight:600;line-height:1.5;word-break:break-word;}
-.ent-hd .del{flex:none;font-size:12px;color:var(--red);padding:3px 8px;border-radius:8px;}
-.ent-hd .del:active{background:#fdecea;}
+.pbox-hd .del{flex:none;font-size:12px;color:var(--red);padding:3px 8px;border-radius:8px;background:#fff;border:1px solid #f3d5d2;}
+.pbox-hd .del:active{background:#fdecea;}
 
 /* ============ 宽屏 ============ */
 @media (min-width:820px){
@@ -266,6 +302,16 @@ tr.total td{background:#f7f9fd;font-weight:600;}
 </head>
 <body>
 
+<div id="gate">
+  <div class="gate-card" id="gateCard">
+    <div class="gate-title">转播技术组日志</div>
+    <div class="gate-sub">请输入访问密码</div>
+    <input type="password" id="gateInput" placeholder="请输入密码" autocomplete="off" inputmode="text">
+    <button class="gate-btn" id="gateBtn" type="button">进入</button>
+    <div class="gate-err" id="gateErr">密码错误，请重试</div>
+  </div>
+</div>
+
 <header class="appbar">
   <div class="appbar-in">
     <div class="applogo">日</div>
@@ -283,7 +329,8 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   <section class="page active" id="page-office">
     <div class="page-head">
       <h2>办公日志</h2>
-      <span class="sub">提交后自动记入当天</span>
+      <span class="sub">默认记今天，可勾选补报昨天</span>
+      <label class="yday" data-yday="office"><input type="checkbox"><span class="dot"></span>补报昨天</label>
       <span class="count" id="cnt-office">今日 0 条</span>
     </div>
 
@@ -291,6 +338,7 @@ tr.total td{background:#f7f9fd;font-weight:600;}
       <div class="field">
         <label class="lb" for="office-project">子项目 <em>*</em></label>
         <select id="office-project"></select>
+        <input type="text" id="office-project-custom" class="project-custom" placeholder="请输入子项目名称" style="display:none;">
       </div>
       <div class="field">
         <label class="lb" for="office-content">今日工作内容 <em>*</em></label>
@@ -331,7 +379,8 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   <section class="page" id="page-site">
     <div class="page-head">
       <h2>施工日志</h2>
-      <span class="sub">提交后自动记入当天</span>
+      <span class="sub">默认记今天，可勾选补报昨天</span>
+      <label class="yday" data-yday="site"><input type="checkbox"><span class="dot"></span>补报昨天</label>
       <span class="count" id="cnt-site">今日 0 条</span>
     </div>
 
@@ -339,6 +388,7 @@ tr.total td{background:#f7f9fd;font-weight:600;}
       <div class="field">
         <label class="lb" for="site-project">子项目 <em>*</em></label>
         <select id="site-project"></select>
+        <input type="text" id="site-project-custom" class="project-custom" placeholder="请输入子项目名称" style="display:none;">
       </div>
       <div class="field">
         <label class="lb" for="site-content">施工内容 <em>*</em></label>
@@ -379,7 +429,8 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   <section class="page" id="page-accept">
     <div class="page-head">
       <h2>验收日志</h2>
-      <span class="sub">提交后自动记入当天</span>
+      <span class="sub">默认记今天，可勾选补报昨天</span>
+      <label class="yday" data-yday="accept"><input type="checkbox"><span class="dot"></span>补报昨天</label>
       <span class="count" id="cnt-accept">今日 0 条</span>
     </div>
 
@@ -387,6 +438,7 @@ tr.total td{background:#f7f9fd;font-weight:600;}
       <div class="field">
         <label class="lb" for="accept-project">子项目 <em>*</em></label>
         <select id="accept-project"></select>
+        <input type="text" id="accept-project-custom" class="project-custom" placeholder="请输入子项目名称" style="display:none;">
       </div>
       <div class="field">
         <label class="lb" for="accept-content">验收内容 <em>*</em></label>
@@ -439,7 +491,7 @@ tr.total td{background:#f7f9fd;font-weight:600;}
 
     <div class="page-head">
       <h2>当日汇总</h2>
-      <span class="sub">默认前一天 · 可逐日切换</span>
+      <span class="sum-title-date" id="sum-title-date"></span>
     </div>
 
     <div class="datebar">
@@ -449,7 +501,6 @@ tr.total td{background:#f7f9fd;font-weight:600;}
         <div class="db-wk" id="sum-wk"></div>
       </div>
       <button class="db-nav" id="sum-next" type="button" aria-label="后一天">&rsaquo;</button>
-      <button class="db-nav db-all" id="sum-all" type="button">全部</button>
     </div>
 
     <div class="sec-title office">办公日志</div>
@@ -489,6 +540,15 @@ tr.total td{background:#f7f9fd;font-weight:600;}
 
 <div id="toast"></div>
 <div id="lightbox"><span class="close">×</span><img alt="预览"></div>
+<div id="confirm-box">
+  <div class="cb-inner">
+    <div class="cb-msg">确认删除这条日志？</div>
+    <div class="cb-btns">
+      <button class="cb-btn cb-ok" id="cb-ok">确认</button>
+      <button class="cb-btn cb-cancel" id="cb-cancel">取消</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ===== 项目任务数据（来自《项目任务清单.xlsx》） ===== */
@@ -498,6 +558,10 @@ var PROJECTS = [], TASKS = {};
 RAW.forEach(function(r){
   if(!TASKS[r.p]){ TASKS[r.p] = []; PROJECTS.push(r.p); }
   TASKS[r.p].push({name:r.t, s:r.s, e:r.e});
+});
+/* 追加暂无任务清单的子项目（仅在下拉中可选，暂不挂具体任务） */
+['鸿蒙演播室','基础周边设施搭建'].forEach(function(p){
+  if(PROJECTS.indexOf(p) < 0){ PROJECTS.push(p); TASKS[p] = []; }
 });
 
 /* ===== 存储 ===== */
@@ -591,7 +655,8 @@ function syncLogbook(removeId, done){
   loadLogbookFromCOS(function(snap){
     var cloud = snap ? snap.logs : [];
     var cloudDeleted = snap ? snap.deletedIds : [];
-    var deleted = uniqueIds(localDeleted.concat(cloudDeleted).concat(removeId ? [removeId] : []));
+    var extra = removeId ? (Array.isArray(removeId) ? removeId : [removeId]) : [];
+    var deleted = uniqueIds(localDeleted.concat(cloudDeleted).concat(extra));
     var merged = mergeById(local, cloud).filter(function(r){ return deleted.indexOf(r.id) === -1; });
     var localLogsChanged = !sameLogs(merged, local);
     var localDeletedChanged = !sameIds(deleted, localDeleted);
@@ -637,6 +702,18 @@ function fillProjects(sel){
 }
 ['office','site','accept'].forEach(function(type){
   fillProjects(document.getElementById(type+'-project'));
+});
+
+/* 子项目选择「其他」时显示自定义名称输入框 */
+['office','site','accept'].forEach(function(type){
+  var sel = document.getElementById(type+'-project');
+  var custom = document.getElementById(type+'-project-custom');
+  function toggle(){
+    var show = sel.value === '其他';
+    custom.style.display = show ? '' : 'none';
+    if(show) custom.focus();
+  }
+  sel.addEventListener('change', toggle);
 });
 
 /* ===== 照片 ===== */
@@ -754,8 +831,14 @@ document.addEventListener('click', function(e){
 /* ===== 提交 ===== */
 function submitLog(type){
   var cfg = CFG[type];
-  var project = document.getElementById(type+'-project').value;
+  var sel = document.getElementById(type+'-project');
+  var project = sel.value;
   if(!project) return toast('请选择子项目');
+  if(project === '其他'){
+    var customName = (document.getElementById(type+'-project-custom').value || '').trim();
+    if(!customName) return toast('请输入子项目名称');
+    project = customName;
+  }
 
   var data = {};
   for(var i=0;i<cfg.fields.length;i++){
@@ -791,10 +874,13 @@ function submitLog(type){
 }
 function finalizeSubmit(type, cfg, project, data, photos){
   var list = loadAll();
+  var ydayEl = document.querySelector('[data-yday="'+type+'"] input');
+  var isYday = ydayEl && ydayEl.checked;
+  var targetDate = isYday ? shiftYmd(today(), -1) : today();
   list.push({
     id: type.charAt(0) + Date.now() + Math.random().toString(36).slice(2,6),
     type: type,
-    date: today(),
+    date: targetDate,
     project: project,
     task: '',
     data: data,
@@ -803,8 +889,13 @@ function finalizeSubmit(type, cfg, project, data, photos){
   });
   if(!saveAll(list)) return;
   var n = photos.length;
+  var sel = document.getElementById(type+'-project');
+  var wasOther = (sel.value === '其他');
   resetForm(type, true);
-  toast(cfg.label + '已提交' + (n ? '，含 ' + n + ' 张照片' : ''));
+  if(wasOther){ sel.value = ''; }
+  if(ydayEl && ydayEl.checked){ ydayEl.checked = false; ydayEl.closest('.yday').classList.remove('on'); }
+  var dateHint = isYday ? '（补记 ' + targetDate + '）' : '';
+  toast(cfg.label + '已提交' + (n ? '，含 ' + n + ' 张照片' : '') + dateHint);
   refreshCounts();
   renderSummary();
   syncLogbook(null, function(ok){ if(!ok) toast('已提交到本机，云端同步失败'); });
@@ -812,12 +903,20 @@ function finalizeSubmit(type, cfg, project, data, photos){
 ['office','site','accept'].forEach(function(type){
   document.getElementById(type+'-submit').addEventListener('click', function(){ submitLog(type); });
 });
+document.querySelectorAll('.yday').forEach(function(lb){
+  var cb = lb.querySelector('input');
+  cb.addEventListener('change', function(){
+    lb.classList.toggle('on', cb.checked);
+  });
+});
 function resetForm(type, keepProject){
   CFG[type].fields.forEach(function(f){
     var el = document.getElementById(type+'-'+f[0]);
     el.value = '';
   });
   if(CFG[type].photos){ PHOTOS[type] = []; renderThumbs(type); }
+  var custom = document.getElementById(type+'-project-custom');
+  if(custom){ custom.value = ''; custom.style.display = 'none'; }
   if(!keepProject){
     document.getElementById(type+'-project').value = '';
   }
@@ -861,10 +960,9 @@ function refreshCounts(){
 var sumDate = document.getElementById('sum-date');
 var sumWk   = document.getElementById('sum-wk');
 var sumHead = document.getElementById('sum-printhead');
+var sumTitleDate = document.getElementById('sum-title-date');
 var sumPrev = document.getElementById('sum-prev');
 var sumNext = document.getElementById('sum-next');
-var sumAll = document.getElementById('sum-all');
-var sumAllMode = false;
 var WEEK_CN = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
 
 function dateFromYmd(v){
@@ -881,91 +979,71 @@ function weekOf(v){ return WEEK_CN[dateFromYmd(v).getDay()]; }
 function projRank(p){ var i = PROJECTS.indexOf(p); return i < 0 ? 999 : i; }
 function rankSort(a, b){ return projRank(a) - projRank(b); }
 function byTime(a, b){ return String(a.createdAt || '').localeCompare(String(b.createdAt || '')); }
-function hhmm(v){
-  var d = new Date(v);
-  if(isNaN(d.getTime())) return '';
-  return pad(d.getHours()) + ':' + pad(d.getMinutes());
-}
 
 /* 汇总日期默认显示前一天 */
 sumDate.value = shiftYmd(today(), -1);
-sumDate.addEventListener('change', function(){ if(!sumAllMode) renderSummary(); });
+sumDate.addEventListener('change', function(){ renderSummary(); });
 sumPrev.addEventListener('click', function(){
-  if(sumAllMode) return;
   sumDate.value = shiftYmd(sumDate.value || today(), -1);
   renderSummary();
 });
 sumNext.addEventListener('click', function(){
-  if(sumAllMode || sumNext.disabled) return;
+  if(sumNext.disabled) return;
   sumDate.value = shiftYmd(sumDate.value || today(), 1);
-  renderSummary();
-});
-sumAll.addEventListener('click', function(){
-  sumAllMode = !sumAllMode;
-  sumAll.classList.toggle('active', sumAllMode);
   renderSummary();
 });
 
 function photoLabel(t){ return (CFG[t] && CFG[t].photoLabel) || '照片'; }
 
 function renderSummary(){
-  var allMode = sumAllMode;
-  var items;
-  if(allMode){
-    sumDate.disabled = true;
-    sumPrev.disabled = true;
-    sumNext.disabled = true;
-    sumWk.textContent = '全部日志';
-    sumHead.textContent = '转播技术组日志 · 全部日志';
-    items = loadAll();
-  } else {
-    sumDate.disabled = false;
-    sumPrev.disabled = false;
-    var d = sumDate.value || shiftYmd(today(), -1);
-    sumDate.value = d;
-    var rel = d === today() ? ' · 今天' : (d === shiftYmd(today(), -1) ? ' · 前一天' : '');
-    sumWk.textContent = d + ' ' + weekOf(d) + rel;
-    sumNext.disabled = (d >= today());
-    sumHead.textContent = '转播技术组日志 · 当日汇总　' + d + ' ' + weekOf(d);
-    items = loadAll().filter(function(r){ return r.date === d; });
-  }
-  fillSection('sum-office', 'office', items, allMode);
-  fillSection('sum-site',   'site',   items, allMode);
-  fillSection('sum-accept', 'accept', items, allMode);
+  sumDate.disabled = false;
+  sumPrev.disabled = false;
+  var d = sumDate.value || shiftYmd(today(), -1);
+  sumDate.value = d;
+  var rel = d === today() ? ' · 今天' : (d === shiftYmd(today(), -1) ? ' · 前一天' : '');
+  sumWk.textContent = d + ' ' + weekOf(d) + rel;
+  sumNext.disabled = (d >= today());
+  sumHead.textContent = '转播技术组日志 · 当日汇总　' + d + ' ' + weekOf(d);
+  sumTitleDate.textContent = d + ' ' + weekOf(d);
+  var items = loadAll().filter(function(r){ return r.date === d; });
+  fillSection('sum-office', 'office', items);
+  fillSection('sum-site',   'site',   items);
+  fillSection('sum-accept', 'accept', items);
   loadLogImages();
 }
 
 /* 一个区块：按子项目拆分成方框 */
-function fillSection(elId, type, items, allMode){
+function fillSection(elId, type, items){
   var el = document.getElementById(elId);
   var list = items.filter(function(r){ return r.type === type; });
   if(!list.length){
-    el.innerHTML = '<div class="empty small">' + (allMode ? '暂无记录' : (sumDate.value || '') + ' 暂无记录') + '</div>';
+    el.innerHTML = '<div class="empty small">' + (sumDate.value || '') + ' 暂无记录</div>';
     return;
   }
   var g = {};
   list.forEach(function(r){ (g[r.project] = g[r.project] || []).push(r); });
   var html = '';
   Object.keys(g).sort(rankSort).forEach(function(p){
-    html += projBox(p, type, g[p], allMode);
+    html += projBox(p, type, g[p]);
   });
   el.innerHTML = html;
 }
 
-function projBox(project, type, list, allMode){
-  var h = '<div class="pbox t-' + type + '"><div class="pbox-hd"><span class="pn">' + esc(project) + '</span></div>' +
+function projBox(project, type, list){
+  var ids = list.map(function(r){ return r.id; }).join(',');
+  var h = '<div class="pbox t-' + type + '"><div class="pbox-hd"><span class="pn">' + esc(project) + '</span>' +
+          '<button class="del no-print" data-del="' + ids + '">删除</button></div>' +
           '<div class="pbox-bd">';
-  var sorted = list.slice();
-  if(allMode){ sorted.sort(function(a,b){ return String(b.createdAt || '').localeCompare(String(a.createdAt || '')); }); }
-  else { sorted.sort(byTime); }
-  sorted.forEach(function(r){ h += entHtml(r, allMode); });
+  var sorted = list.slice().sort(byTime);
+  sorted.forEach(function(r){ h += entHtml(r); });
   return h + '</div></div>';
 }
 
-function entHtml(r, showDate){
-  var head = (showDate ? esc(r.date) + ' ' : '') + esc(r.task || (hhmm(r.createdAt) + ' 提交'));
-  var h = '<div class="ent"><div class="ent-hd"><div class="tk">' + head + '</div>' +
-          '<button class="del no-print" data-del="' + r.id + '">删除</button></div>';
+function entHtml(r){
+  var h = '<div class="ent">';
+  if(r.task){
+    h += '<div class="ent-hd"><div class="tk">' + esc(r.task) + '</div></div>';
+  }
   Object.keys(r.data || {}).forEach(function(k){
     var v = r.data[k];
     if(v === '' || v == null) return;
@@ -983,28 +1061,55 @@ function entHtml(r, showDate){
   return h + '</div>';
 }
 
+var pendingDelIds = null;
+var confirmBox = document.getElementById('confirm-box');
+var cbOk = document.getElementById('cb-ok');
+var cbCancel = document.getElementById('cb-cancel');
+var cbMsg = confirmBox.querySelector('.cb-msg');
+function openConfirm(ids){
+  pendingDelIds = ids.split(',').filter(Boolean);
+  cbMsg.textContent = pendingDelIds.length > 1
+    ? '确认删除该项目当天的 ' + pendingDelIds.length + ' 条日志？'
+    : '确认删除这条日志？';
+  confirmBox.classList.add('show');
+}
+function closeConfirm(){
+  pendingDelIds = null;
+  confirmBox.classList.remove('show');
+}
 ['sum-office','sum-site','sum-accept'].forEach(function(id){
   document.getElementById(id).addEventListener('click', function(e){
     var del = e.target.closest('[data-del]');
     if(!del) return;
-    if(!confirm('确认删除这条日志？')) return;
-    var delId = del.dataset.del;
-    var all = loadAll();
-    var target = null;
-    for(var i=0;i<all.length;i++){ if(all[i].id === delId){ target = all[i]; break; } }
-    saveAll(all.filter(function(r){ return r.id !== delId; }));
-    saveDeletedIds(uniqueIds(loadDeletedIds().concat([delId])));
-    renderSummary(); refreshCounts(); toast('已删除');
-    syncLogbook(delId, function(ok){
-      if(ok){
+    openConfirm(del.dataset.del);
+  });
+});
+cbOk.addEventListener('click', function(){
+  var delIds = pendingDelIds;
+  if(!delIds || !delIds.length) return;
+  closeConfirm();
+  var all = loadAll();
+  var targets = all.filter(function(r){ return delIds.indexOf(r.id) !== -1; });
+  var delSet = {};
+  delIds.forEach(function(x){ delSet[x] = 1; });
+  saveAll(all.filter(function(r){ return !delSet[r.id]; }));
+  saveDeletedIds(uniqueIds(loadDeletedIds().concat(delIds)));
+  renderSummary(); refreshCounts(); toast('已删除');
+  syncLogbook(delIds, function(ok){
+    if(ok){
+      targets.forEach(function(target){
         if(target && target.photos && target.photos.length){
           target.photos.forEach(function(p){ if(p && p.key) deletePhoto(p.key); });
         }
-      } else {
-        toast('已在本机删除，云端同步失败');
-      }
-    });
+      });
+    } else {
+      toast('已在本机删除，云端同步失败');
+    }
   });
+});
+cbCancel.addEventListener('click', closeConfirm);
+confirmBox.addEventListener('click', function(e){
+  if(e.target === confirmBox) closeConfirm();
 });
 
 /* ===== 导出 PDF ===== */
@@ -1018,7 +1123,7 @@ function openLightbox(src){
 document.getElementById('lightbox').addEventListener('click', function(){ this.classList.remove('show'); });
 
 /* ===== 启动 ===== */
-(function(){
+function appStart(){
   var d = new Date();
   var w = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
   document.getElementById('todayText').textContent =
@@ -1026,6 +1131,37 @@ document.getElementById('lightbox').addEventListener('click', function(){ this.c
   refreshCounts();
   renderSummary();
   syncLogbook();
+}
+
+/* ===== 访问密码（整页遮罩） ===== */
+var GATE_PWD = atob('c3ptZw==');
+function gateUnlock(){
+  var gate = document.getElementById('gate');
+  gate.style.transition = 'opacity .3s';
+  gate.style.opacity = '0';
+  setTimeout(function(){ gate.style.display = 'none'; }, 300);
+  appStart();
+}
+function gateFail(){
+  var card = document.getElementById('gateCard');
+  var err = document.getElementById('gateErr');
+  var input = document.getElementById('gateInput');
+  err.classList.add('show');
+  card.classList.remove('shake');
+  void card.offsetWidth;
+  card.classList.add('shake');
+  input.value = ''; input.focus();
+}
+(function(){
+  var input = document.getElementById('gateInput');
+  var btn = document.getElementById('gateBtn');
+  function tryUnlock(){
+    if(input.value === GATE_PWD){ gateUnlock(); }
+    else { gateFail(); }
+  }
+  btn.addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', function(e){ if(e.key === 'Enter') tryUnlock(); });
+  input.focus();
 })();
 </script>
 </body>
