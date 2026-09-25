@@ -110,7 +110,6 @@ select{
 }
 textarea{resize:vertical;min-height:104px;line-height:1.65;padding-top:12px;font-size:16px;}
 #office-content,#site-content,#accept-content{min-height:208px;}
-#office-plan,#office-issue,#site-issue,#site-coord,#accept-issue,#accept-coord{min-height:70px;}
 input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,109,255,.11);}
 select:disabled{color:var(--txt3);background-color:#f5f7fa;}
 .project-custom{margin-top:8px;}
@@ -143,6 +142,73 @@ select:disabled{color:var(--txt3);background-color:#f5f7fa;}
 }
 .thumb .no{position:absolute;left:5px;top:5px;background:rgba(12,20,35,.55);color:#fff;
   font-size:11px;padding:1px 7px;border-radius:20px;}
+
+/* ============ 问题/风险条目（表单） ============ */
+.issue-item{
+  border:1px solid var(--line);border-radius:12px;background:#fbfcfe;padding:11px 12px;margin-bottom:10px;position:relative;
+}
+.issue-item .ii-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.issue-item textarea{min-height:60px;font-size:15px;}
+.issue-item .ii-full{grid-column:1 / -1;}
+.issue-item .ii-del{position:absolute;right:9px;top:9px;width:26px;height:26px;border-radius:50%;
+  background:#f1f5fb;color:var(--txt3);font-size:16px;line-height:26px;text-align:center;flex:none;}
+.issue-item .ii-del:active{background:#fdecea;color:var(--red);}
+.ii-head{font-size:12px;color:var(--txt3);margin-bottom:6px;font-weight:600;letter-spacing:.3px;}
+.ii-add{
+  display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:46px;
+  border:1px dashed #c3d2e8;border-radius:11px;background:#fafcff;color:var(--blue-d);font-size:14px;font-weight:500;transition:.15s;
+}
+.ii-add:active{border-color:var(--blue);background:var(--blue-bg);}
+.risk-pills{display:flex;gap:7px;}
+.risk-pill{flex:1;height:42px;display:flex;align-items:center;justify-content:center;border-radius:10px;
+  border:1px solid var(--line);background:#fff;font-size:13.5px;color:var(--txt2);font-weight:500;transition:.12s;}
+.risk-pill.on-hi{background:#fdecec;border-color:#f2c3c1;color:#c0392b;font-weight:600;}
+.risk-pill.on-mid{background:#fff3e2;border-color:#f0d0a5;color:#b35c00;font-weight:600;}
+.risk-pill.on-low{background:#fffbe8;border-color:#ecdfa8;color:#8a7a1f;font-weight:600;}
+
+/* ============ 问题台账看板 ============ */
+.issue-board{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px;}
+.issue-list{padding:8px 13px 13px;}
+.icard{border-radius:12px;padding:12px;margin-bottom:10px;position:relative;border:1px solid #ececec;border-left-width:4px;background:#fdfdfd;}
+.icard.hi{border-left-color:#e24b4a;}
+.icard.mid{border-left-color:#ef9f27;}
+.icard.low{border-left-color:#e6d57c;}
+.icard.done{background:#f3f8f4;border-color:#d4e8da;border-left-color:#bfe6cf;opacity:.82;}
+.icard-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px;}
+.badge-risk{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;flex:none;}
+.badge-risk.hi{background:#e24b4a;}
+.badge-risk.mid{background:#ef9f27;}
+.badge-risk.low{background:#e6d57c;}
+.badge-status{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;flex:none;}
+.badge-status.todo{background:#fff;color:#c0392b;border:1px solid #f0c6c3;}
+.badge-status.doing{background:#fff;color:#b35c00;border:1px solid #f0d0a5;}
+.badge-status.resolved{background:#e7f8ef;color:#0f9152;border:1px solid #bfe6cf;}
+.icard-proj{margin-left:auto;font-size:13px;font-weight:700;color:var(--txt);word-break:break-word;}
+.icard-date{font-size:12px;color:var(--txt3);margin-right:8px;flex:none;}
+.icard .desc{font-size:14.5px;line-height:1.55;word-break:break-word;margin-bottom:6px;display:flex;align-items:baseline;gap:4px;}
+.icard .desc .desc-txt{flex:1;word-break:break-word;}
+.icard .meta{font-size:12px;color:var(--txt3);margin-bottom:7px;}
+.icard .meta b{color:var(--txt2);font-weight:600;}
+.timeline{margin:8px 0 2px;}
+.tl-item{display:flex;gap:8px;font-size:12.5px;color:var(--txt2);line-height:1.5;padding:2px 0;}
+.tl-item .dot{flex:none;width:6px;height:6px;border-radius:50%;background:#c3cbe0;margin-top:7px;}
+.tl-item .t{flex:none;color:var(--txt3);font-size:11.5px;margin-top:1px;}
+.tl-item .c{flex:1;word-break:break-word;}
+.icard-ops{display:flex;gap:8px;margin-top:9px;}
+.icard-ops .op{flex:1;height:38px;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px;}
+.op-progress{background:#fff;border:1px solid #c9daff;color:var(--blue);}
+.op-progress:active{background:var(--blue-bg);}
+.op-resolve{background:#e7f8ef;border:1px solid #bfe6cf;color:var(--green);}
+.op-resolve:active{background:#d3f0df;}
+.op-delete{background:#fff;border:1px solid #f3d5d2;color:var(--red);}
+.op-delete:active{background:#fdecea;}
+.icard-ops .op.no-print{display:flex;}
+.issue-empty{padding:26px 14px;text-align:center;color:var(--txt3);font-size:13px;}
+/* 进展/解决 弹层输入 */
+.ii-inline{border:1px solid #c9daff;border-radius:10px;background:#fff;padding:9px;margin-top:9px;}
+.ii-inline textarea{min-height:58px;font-size:14.5px;}
+.ii-inline .row{display:flex;gap:8px;margin-top:8px;}
+.ii-inline .row .btn{min-height:40px;font-size:13.5px;}
 
 /* ============ 按钮 ============ */
 .btn{
@@ -297,9 +363,14 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   .print-head{display:block;font-size:17px;font-weight:700;margin:0 0 12px;}
   .page-head{display:none!important;}
   .del{display:none!important;}
+  .icard-ops{display:none!important;}
   .stats{grid-template-columns:repeat(4,1fr);}
   body{background:#fff;padding:0;}
   .card,.rec,.tbl-wrap,.empty,.pbox,.stat{border-color:#ddd;box-shadow:none;break-inside:avoid;}
+  .kv .v{font-size:16px;line-height:1.65;}
+  .icard .desc{font-size:16px;line-height:1.6;}
+  .tl-item{font-size:16px;}
+  .tl-item .t{font-size:14px;}
   @page{margin:14mm 12mm;}
 }
 </style>
@@ -344,16 +415,16 @@ tr.total td{background:#f7f9fd;font-weight:600;}
         <input type="text" id="office-project-custom" class="project-custom" placeholder="请输入子项目名称" style="display:none;">
       </div>
       <div class="field">
-        <label class="lb" for="office-content">今日工作内容 <em>*</em></label>
+        <label class="lb" for="office-content">今日工作内容</label>
         <textarea id="office-content"></textarea>
       </div>
       <div class="field">
-        <label class="lb" for="office-plan">明日工作计划</label>
-        <textarea id="office-plan"></textarea>
-      </div>
-      <div class="field">
-        <label class="lb" for="office-issue">存在问题和需协调事项</label>
-        <textarea id="office-issue"></textarea>
+        <label class="lb">问题与风险/协调进度 <span class="opt">可添加多条，标注风险与协调进度</span></label>
+        <div class="issues" id="office-issues"></div>
+        <button class="ii-add" type="button" data-add-issue="office">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          添加问题/风险
+        </button>
       </div>
       <div class="field">
         <label class="lb">照片 <span class="opt">可多张</span></label>
@@ -393,16 +464,16 @@ tr.total td{background:#f7f9fd;font-weight:600;}
         <input type="text" id="site-project-custom" class="project-custom" placeholder="请输入子项目名称" style="display:none;">
       </div>
       <div class="field">
-        <label class="lb" for="site-content">施工内容 <em>*</em></label>
+        <label class="lb" for="site-content">施工内容</label>
         <textarea id="site-content"></textarea>
       </div>
       <div class="field">
-        <label class="lb" for="site-issue">存在问题及处理措施</label>
-        <textarea id="site-issue"></textarea>
-      </div>
-      <div class="field">
-        <label class="lb" for="site-coord">需协调事项</label>
-        <textarea id="site-coord"></textarea>
+        <label class="lb">问题与风险/协调进度 <span class="opt">可添加多条，标注风险与协调进度</span></label>
+        <div class="issues" id="site-issues"></div>
+        <button class="ii-add" type="button" data-add-issue="site">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          添加问题/风险
+        </button>
       </div>
       <div class="field">
         <label class="lb">现场照片 <span class="opt">可多张</span></label>
@@ -442,7 +513,7 @@ tr.total td{background:#f7f9fd;font-weight:600;}
         <input type="text" id="accept-project-custom" class="project-custom" placeholder="请输入子项目名称" style="display:none;">
       </div>
       <div class="field">
-        <label class="lb" for="accept-content">验收内容 <em>*</em></label>
+        <label class="lb" for="accept-content">验收内容</label>
         <textarea id="accept-content"></textarea>
       </div>
       <div class="field">
@@ -455,12 +526,12 @@ tr.total td{background:#f7f9fd;font-weight:600;}
         </select>
       </div>
       <div class="field">
-        <label class="lb" for="accept-issue">存在问题及处理措施</label>
-        <textarea id="accept-issue"></textarea>
-      </div>
-      <div class="field">
-        <label class="lb" for="accept-coord">需协调事项</label>
-        <textarea id="accept-coord"></textarea>
+        <label class="lb">问题与风险/协调进度 <span class="opt">可添加多条，标注风险与协调进度</span></label>
+        <div class="issues" id="accept-issues"></div>
+        <button class="ii-add" type="button" data-add-issue="accept">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          添加问题/风险
+        </button>
       </div>
       <div class="field">
         <label class="lb">验收照片 <span class="opt">可多张</span></label>
@@ -501,6 +572,11 @@ tr.total td{background:#f7f9fd;font-weight:600;}
         <input type="date" id="sum-date">
       </div>
       <button class="db-nav" id="sum-next" type="button" aria-label="后一天">&rsaquo;</button>
+    </div>
+
+    <div class="sec-title" style="margin-top:4px;">问题与风险/协调进度台账</div>
+    <div class="issue-board">
+      <div class="issue-list" id="issue-list"></div>
     </div>
 
     <div class="sec-title office">办公日志</div>
@@ -609,14 +685,15 @@ function loadLogbookFromCOS(cb){
       var parsed = JSON.parse(cosBodyToString(data.Body));
       var logs = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.logs) ? parsed.logs : []);
       var deletedIds = Array.isArray(parsed.deletedIds) ? parsed.deletedIds : [];
-      cb({ logs: logs, deletedIds: deletedIds });
+      var issues = Array.isArray(parsed.issues) ? parsed.issues : [];
+      cb({ logs: logs, deletedIds: deletedIds, issues: issues });
     }catch(e){ cb(null); }
   });
 }
 function saveLogbookToCOS(snapshot, done){
   var client = getLogCos();
   if(!client){ if(done) done(false); return; }
-  var payload = { logs: snapshot.logs || [], deletedIds: snapshot.deletedIds || [], backupTime: new Date().toISOString() };
+  var payload = { logs: snapshot.logs || [], deletedIds: snapshot.deletedIds || [], issues: snapshot.issues || [], backupTime: new Date().toISOString() };
   var body = JSON.stringify(payload, null, 2);
   client.putObject({ Bucket: LOG_COS_CONFIG.bucket, Region: LOG_COS_CONFIG.region, Key: LOG_KEY, Body: body, ContentType: 'application/json; charset=utf-8' }, function(err){
     if(err){ if(done) done(false); return; }
@@ -649,28 +726,55 @@ function mergeById(a, b){
   (a || []).concat(b || []).forEach(function(r){ if(r && r.id) map[r.id] = r; });
   return Object.keys(map).map(function(k){ return map[k]; });
 }
+function mergeIssues(a, b){
+  // 合并两份台账：按 id 去重；deleted 优先；否则取 updatedAt 较新的一条
+  var map = {};
+  (a || []).concat(b || []).forEach(function(it){
+    if(!it || !it.id) return;
+    var cur = map[it.id];
+    if(!cur){ map[it.id] = it; return; }
+    if(it.deleted && !cur.deleted){ map[it.id] = it; return; }
+    if(cur.deleted && !it.deleted) return;
+    // 都未删或都已删：取 updatedAt 较新
+    if((it.updatedAt || '') > (cur.updatedAt || '')){ map[it.id] = it; }
+  });
+  return Object.keys(map).map(function(k){ return map[k]; });
+}
+function sameIssues(a, b){
+  return JSON.stringify(sortIssuesById(a)) === JSON.stringify(sortIssuesById(b));
+}
+function sortIssuesById(arr){
+  return (arr || []).slice().sort(function(x, y){ return String(x.id).localeCompare(String(y.id)); });
+}
 function syncLogbook(removeId, done){
   var local = loadAll();
   var localDeleted = loadDeletedIds();
+  var localIssues = loadIssues();
   loadLogbookFromCOS(function(snap){
     var cloud = snap ? snap.logs : [];
     var cloudDeleted = snap ? snap.deletedIds : [];
+    var cloudIssues = snap ? snap.issues : [];
     var extra = removeId ? (Array.isArray(removeId) ? removeId : [removeId]) : [];
     var deleted = uniqueIds(localDeleted.concat(cloudDeleted).concat(extra));
     var merged = mergeById(cloud, local).filter(function(r){ return deleted.indexOf(r.id) === -1; });
+    // 台账合并：云端 + 本地按 id 去重（本地更新优先）
+    var mergedIssues = mergeIssues(cloudIssues, localIssues);
     var localLogsChanged = !sameLogs(merged, local);
     var localDeletedChanged = !sameIds(deleted, localDeleted);
+    var localIssuesChanged = !sameIssues(mergedIssues, localIssues);
     var cloudLogsChanged = !sameLogs(merged, cloud);
     var cloudDeletedChanged = !sameIds(deleted, cloudDeleted);
+    var cloudIssuesChanged = !sameIssues(mergedIssues, cloudIssues);
     if(localLogsChanged) saveAll(merged);
     if(localDeletedChanged) saveDeletedIds(deleted);
-    if(cloudLogsChanged || cloudDeletedChanged){
-      saveLogbookToCOS({ logs: merged, deletedIds: deleted }, function(ok){
+    if(localIssuesChanged) saveIssues(mergedIssues);
+    if(cloudLogsChanged || cloudDeletedChanged || cloudIssuesChanged){
+      saveLogbookToCOS({ logs: merged, deletedIds: deleted, issues: mergedIssues }, function(ok){
         refreshCounts(); renderSummary();
         if(done) done(ok);
       });
     } else {
-      if(localLogsChanged || localDeletedChanged){ refreshCounts(); renderSummary(); }
+      if(localLogsChanged || localDeletedChanged || localIssuesChanged){ refreshCounts(); renderSummary(); }
       if(done) done(true);
     }
   });
@@ -688,11 +792,81 @@ function toast(msg){
 
 /* ===== 日志类型配置 ===== */
 var CFG = {
-  office: { label:'办公日志', fields:[['content','今日工作内容'],['plan','明日工作计划'],['issue','存在问题和需协调事项']], photos:true, photoLabel:'照片' },
-  site:   { label:'施工日志', fields:[['content','施工内容'],['issue','存在问题及处理措施'],['coord','需协调事项']], photos:true, photoLabel:'现场照片' },
-  accept: { label:'验收日志', fields:[['content','验收内容'],['result','验收结论'],['issue','存在问题及处理措施'],['coord','需协调事项']], photos:true, photoLabel:'验收照片' }
+  office: { label:'办公日志', fields:[['content','今日工作内容']], photos:true, photoLabel:'照片', issues:true },
+  site:   { label:'施工日志', fields:[['content','施工内容']], photos:true, photoLabel:'现场照片', issues:true },
+  accept: { label:'验收日志', fields:[['content','验收内容'],['result','验收结论']], photos:true, photoLabel:'验收照片', issues:true }
 };
 var PHOTOS = { office:[], site:[], accept:[] };
+
+/* ===== 问题/风险条目（表单态） ===== */
+var ISSUES = { office:[], site:[], accept:[] };
+var RISK_LEVELS = ['高','中','低'];
+var COORD_STATES = [
+  { v:'todo',  label:'待协调' },
+  { v:'doing', label:'协调中' },
+  { v:'resolved', label:'已解决' }
+];
+function riskClassOf(r){ return r === '高' ? 'hi' : (r === '中' ? 'mid' : 'low'); }
+function coordLabel(v){ for(var i=0;i<COORD_STATES.length;i++){ if(COORD_STATES[i].v===v) return COORD_STATES[i].label; } return ''; }
+
+function issueItemHtml(type, it){
+  it = it || {};
+  var risk = it.risk || '';
+  var coord = it.coord || '';
+  var riskt = risk ? ['高','中','低'].map(function(r){
+    return '<button type="button" class="risk-pill'+(r===risk?' on-'+riskClassOf(r):'')+'" data-risk="'+r+'">'+r+'</button>';
+  }).join('') : ['高','中','低'].map(function(r){
+    return '<button type="button" class="risk-pill" data-risk="'+r+'">'+r+'</button>';
+  }).join('');
+  var coordOpts = COORD_STATES.map(function(c){
+    return '<option value="'+c.v+'"'+(c.v===coord?' selected':'')+'>'+c.label+'</option>';
+  }).join('');
+  return '<div class="issue-item"' + (it.issId ? ' data-issid="' + esc(it.issId) + '"' : '') + '>' +
+    '<button type="button" class="ii-del" title="删除该条">×</button>' +
+    '<div class="ii-grid">' +
+      '<div class="ii-full"><div class="ii-head">问题 / 风险描述</div>' +
+        '<textarea class="ii-desc" placeholder="描述问题或风险，如：10KV电缆桥架缺货，影响通电节点">' + esc(it.desc || '') + '</textarea></div>' +
+      '<div><div class="ii-head">风险等级</div><div class="risk-pills">' + riskt + '</div></div>' +
+      '<div><div class="ii-head">协调状态</div><select class="ii-coord" style="min-height:42px;padding:8px 11px;">' + coordOpts + '</select></div>' +
+      '<div><div class="ii-head">负责人</div>' +
+        '<input type="text" class="ii-owner" placeholder="谁负责（选填）" value="' + esc(it.owner || '') + '"></div>' +
+      '<div><div class="ii-head">协调对象</div>' +
+        '<input type="text" class="ii-target" placeholder="与谁协调（选填）" value="' + esc(it.target || '') + '"></div>' +
+    '</div>' +
+  '</div>';
+}
+function addIssueItem(type, it){
+  var box = document.getElementById(type+'-issues');
+  var div = document.createElement('div');
+  div.innerHTML = issueItemHtml(type, it);
+  var node = div.firstElementChild;
+  node.dataset.type = type;
+  box.appendChild(node);
+}
+function readIssues(type){
+  var box = document.getElementById(type+'-issues');
+  var out = [];
+  box.querySelectorAll('.issue-item').forEach(function(node){
+    var desc = (node.querySelector('.ii-desc').value || '').trim();
+    var risk = '';
+    var onRisk = node.querySelector('.risk-pill.on-hi,.risk-pill.on-mid,.risk-pill.on-low');
+    if(onRisk) risk = onRisk.dataset.risk;
+    var coord = node.querySelector('.ii-coord').value;
+    var owner = (node.querySelector('.ii-owner').value || '').trim();
+    var target = (node.querySelector('.ii-target').value || '').trim();
+    if(!desc && !owner && !target) return;  // 全空则跳过
+    var issId = node.dataset.issid || newIssueId();
+    if(!node.dataset.issid) node.dataset.issid = issId;
+    out.push({ desc:desc, risk:risk || '', owner:owner, target:target, coord:coord || 'todo', issId: issId });
+  });
+  return out;
+}
+function resetIssues(type){
+  var box = document.getElementById(type+'-issues');
+  box.innerHTML = '';
+  ISSUES[type] = [];
+  addIssueItem(type, null);
+}
 
 /* ===== 子项目 ===== */
 function fillProjects(sel){
@@ -835,6 +1009,28 @@ document.addEventListener('click', function(e){
   }
 });
 
+/* ===== 问题/风险条目（表单交互） ===== */
+document.addEventListener('click', function(e){
+  var add = e.target.closest('[data-add-issue]');
+  if(add){ addIssueItem(add.dataset.addIssue, null); return; }
+  var rp = e.target.closest('.risk-pill');
+  if(rp){
+    var item = rp.closest('.issue-item');
+    item.querySelectorAll('.risk-pill').forEach(function(p){ p.classList.remove('on-hi','on-mid','on-low'); });
+    var r = rp.dataset.risk;
+    rp.classList.add('on-' + riskClassOf(r));
+    return;
+  }
+  var idel = e.target.closest('.issue-item .ii-del');
+  if(idel){
+    var item2 = idel.closest('.issue-item');
+    var box = item2.parentElement;
+    item2.remove();
+    if(!box.children.length){ addIssueItem(box.id.replace('-issues',''), null); }
+    return;
+  }
+});
+
 /* ===== 提交 ===== */
 function submitLog(type){
   var cfg = CFG[type];
@@ -851,10 +1047,13 @@ function submitLog(type){
   for(var i=0;i<cfg.fields.length;i++){
     var key = cfg.fields[i][0], label = cfg.fields[i][1];
     var v = (document.getElementById(type+'-'+key).value || '').trim();
-    var required = (key === 'content' || (type === 'accept' && key === 'result'));
+    var required = (type === 'accept' && key === 'result');
     if(required && !v) return toast('请填写「'+label+'」');
     if(v) data[label] = v;
   }
+
+  var issues = cfg.issues ? readIssues(type) : [];
+  if(issues.length){ data['问题与风险'] = issues; }
 
   var photos = cfg.photos ? PHOTOS[type].slice() : [];
   if(!photos.length){ finalizeSubmit(type, cfg, project, data, []); return; }
@@ -899,7 +1098,11 @@ function finalizeSubmit(type, cfg, project, data, photos){
     var removed = editingRemovedKeys.slice();
     editingRemovedKeys = [];
     if(!saveAll(list)) return;
+    var editingIdBefore = editingId;
     exitEditMode(type);
+    var rec = null;
+    for(var k=0;k<list.length;k++){ if(list[k].id === editingIdBefore) rec = list[k]; }
+    if(rec) syncIssuesFromLog(rec);
     var n = photos.length;
     toast(cfg.label + '已保存修改' + (n ? '，含 ' + n + ' 张照片' : ''));
     refreshCounts();
@@ -917,7 +1120,7 @@ function finalizeSubmit(type, cfg, project, data, photos){
   var ydayEl = document.querySelector('[data-yday="'+type+'"] input');
   var isYday = ydayEl && ydayEl.checked;
   var targetDate = isYday ? shiftYmd(today(), -1) : today();
-  list.push({
+  var newRec = {
     id: type.charAt(0) + Date.now() + Math.random().toString(36).slice(2,6),
     type: type,
     date: targetDate,
@@ -926,8 +1129,10 @@ function finalizeSubmit(type, cfg, project, data, photos){
     data: data,
     photos: photos,
     createdAt: new Date().toISOString()
-  });
+  };
+  list.push(newRec);
   if(!saveAll(list)) return;
+  syncIssuesFromLog(newRec);
   var n = photos.length;
   var sel = document.getElementById(type+'-project');
   var wasOther = (sel.value === '其他');
@@ -954,6 +1159,7 @@ function resetForm(type, keepProject){
     var el = document.getElementById(type+'-'+f[0]);
     el.value = '';
   });
+  if(CFG[type].issues){ resetIssues(type); }
   if(CFG[type].photos){ PHOTOS[type] = []; renderThumbs(type); }
   var custom = document.getElementById(type+'-project-custom');
   if(custom){ custom.value = ''; custom.style.display = 'none'; }
@@ -1010,6 +1216,18 @@ function startEdit(id){
     el.value = (rec.data && rec.data[label]) || '';
   });
 
+  // 回填问题/风险条目
+  if(CFG[type].issues){
+    var box = document.getElementById(type+'-issues');
+    box.innerHTML = '';
+    var issues = (rec.data && rec.data['问题与风险']) || [];
+    if(Array.isArray(issues) && issues.length){
+      issues.forEach(function(it){ addIssueItem(type, it); });
+    } else {
+      addIssueItem(type, null);
+    }
+  }
+
   // 回填照片（保留旧照片 key + 新照片 data 均可能）
   PHOTOS[type] = (rec.photos || []).slice();
   renderThumbs(type);
@@ -1054,6 +1272,67 @@ function refreshCounts(){
   document.getElementById('cnt-site').textContent   = '今日 ' + n.site + ' 条';
   document.getElementById('cnt-accept').textContent = '今日 ' + n.accept + ' 条';
   document.getElementById('topChip').textContent    = '今日 ' + total + ' 条';
+}
+
+/* ===== 问题台账（独立存储，跨天跟踪） ===== */
+var ISS_KEY = 'xinwen_issues_v1';
+function loadIssues(){ try{ return JSON.parse(localStorage.getItem(ISS_KEY)) || []; }catch(e){ return []; } }
+function saveIssues(arr){ try{ localStorage.setItem(ISS_KEY, JSON.stringify(arr)); return true; }catch(e){ toast('问题台账存储失败'); return false; } }
+function newIssueId(){ return 'iss' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* 从日志记录中提取问题条目，写入台账（提交/编辑时调用）。
+   规则：日志数据里的「问题与风险」数组，每条视为一个问题；
+   - 若带 issId（编辑已有台账问题）则更新该条
+   - 否则新建一条 */
+function syncIssuesFromLog(rec){
+  var issues = loadIssues();
+  var items = (rec.data && rec.data['问题与风险']) || [];
+  if(!Array.isArray(items)) items = [];
+  var keepIds = {};
+  items.forEach(function(it){
+    if(it == null) return;
+    var issId = it.issId || newIssueId();
+    keepIds[issId] = 1;
+    var found = null;
+    for(var i=0;i<issues.length;i++){ if(issues[i].id === issId){ found = issues[i]; break; } }
+    if(found){
+      found.desc = it.desc || found.desc;
+      found.risk = it.risk || found.risk;
+      found.owner = it.owner || found.owner;
+      found.target = it.target || found.target;
+      if(it.coord === 'resolved'){
+        if(found.coord !== 'resolved'){ found.resolvedAt = rec.date || today(); }
+        found.coord = 'resolved';
+      } else if(found.coord !== 'resolved'){
+        found.coord = it.coord || found.coord || 'todo';
+      }
+      found.logId = rec.id; found.logType = rec.type; found.project = rec.project;
+      found.updatedAt = new Date().toISOString();
+    } else {
+      issues.push({
+        id: issId,
+        desc: it.desc || '',
+        risk: it.risk || '',
+        owner: it.owner || '',
+        target: it.target || '',
+        coord: (it.coord === 'resolved') ? 'resolved' : (it.coord || 'todo'),
+        project: rec.project,
+        logId: rec.id, logType: rec.type,
+        createdAt: rec.date || today(),
+        resolvedAt: (it.coord === 'resolved') ? (rec.date || today()) : '',
+        timeline: [],
+        updatedAt: new Date().toISOString()
+      });
+    }
+  });
+  // 本日志中不再包含的问题（编辑时删掉某条），若该问题仅来自本日志则标记删除
+  var recIssues = items.map(function(it){ return it && it.issId; }).filter(Boolean);
+  issues.forEach(function(iss){
+    if(iss.logId === rec.id && recIssues.indexOf(iss.id) === -1){
+      iss.deleted = true;
+    }
+  });
+  saveIssues(issues);
 }
 
 /* ===== 汇总 ===== */
@@ -1103,10 +1382,90 @@ function renderSummary(){
   sumHead.textContent = '转播技术组日志 · 当日汇总　' + d + ' ' + weekOf(d);
   sumTitleDate.textContent = d + ' ' + weekOf(d);
   var items = loadAll().filter(function(r){ return r.date === d; });
+  renderIssueBoard();
   fillSection('sum-office', 'office', items);
   fillSection('sum-site',   'site',   items);
   fillSection('sum-accept', 'accept', items);
   loadLogImages();
+}
+
+/* ===== 问题台账看板 ===== */
+function issueBoardData(){
+  var issues = loadIssues().filter(function(iss){ return !iss.deleted; });
+  var t = today();
+  var open = [];
+  issues.forEach(function(iss){
+    // 已解决：仅在解决当天显示（resolvedAt === 今天），之后不再出现
+    if(iss.coord === 'resolved'){
+      if(iss.resolvedAt === t) open.push(iss);
+      return;
+    }
+    // 未解决：全部显示（持续跟进，不受汇总日期影响）
+    open.push(iss);
+  });
+  // 排序：风险 高>中>低，再按提出时间倒序
+  function riskWeight(iss){ return iss.risk === '高' ? 0 : (iss.risk === '中' ? 1 : 2); }
+  open.sort(function(a,b){
+    var r = riskWeight(a) - riskWeight(b);
+    if(r !== 0) return r;
+    return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+  });
+  return open;
+}
+
+function renderIssueBoard(){
+  var list = issueBoardData();
+  var box = document.getElementById('issue-list');
+  if(!list.length){
+    box.innerHTML = '<div class="issue-empty">当前没有待跟进的问题</div>';
+    return;
+  }
+  box.innerHTML = list.map(issueCardHtml).join('');
+}
+function fmtYmd(y){ return String(y||'').slice(5).replace('-','/'); }
+function issueCardHtml(iss){
+  var rc = riskClassOf(iss.risk);
+  var h = '<div class="icard ' + rc + '" data-issid="' + esc(iss.id) + '">';
+  // 顶部：风险等级 + 协调状态（右）+ 项目名（加粗，靠右）
+  h += '<div class="icard-top">';
+  if(iss.risk) h += '<span class="badge-risk ' + rc + '">' + esc(iss.risk) + '风险</span>';
+  h += '<span class="badge-status ' + esc(iss.coord) + '">' + esc(coordLabel(iss.coord)) + '</span>';
+  if(iss.project) h += '<span class="icard-proj">' + esc(iss.project) + '</span>';
+  h += '</div>';
+  // 提出时间 + 问题内容 同行
+  h += '<div class="desc">';
+  if(iss.createdAt) h += '<span class="icard-date">' + fmtYmd(iss.createdAt) + '</span>';
+  h += '<span class="desc-txt">' + esc(iss.desc) + '</span>';
+  h += '</div>';
+  // 负责人 / 协调对象
+  var meta = [];
+  if(iss.owner) meta.push('负责人：<b>' + esc(iss.owner) + '</b>');
+  if(iss.target) meta.push('协调对象：<b>' + esc(iss.target) + '</b>');
+  if(meta.length) h += '<div class="meta">' + meta.join(' · ') + '</div>';
+  // 进展时间线（显示进展时间 + 内容）
+  if(iss.timeline && iss.timeline.length){
+    h += '<div class="timeline">' + iss.timeline.map(function(tl){
+      return '<div class="tl-item"><span class="dot"></span><span class="t">' + fmtYmd(tl.t) + '</span><span class="c">' + esc(tl.txt) + '</span></div>';
+    }).join('') + '</div>';
+  }
+  // 操作：未解决显示「补充进展 + 标记已解决 + 删除」，已解决仅显示「删除」
+  h += '<div class="icard-ops no-print">';
+  if(iss.coord !== 'resolved'){
+    h += '<button class="op op-progress" data-iss-op="progress">补充进展</button>' +
+         '<button class="op op-resolve" data-iss-op="resolve">标记已解决</button>';
+  }
+  h += '<button class="op op-delete" data-iss-op="delete">删除</button>';
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+function projBox(project, type, list){
+  var h = '<div class="pbox t-' + type + '"><div class="pbox-hd"><span class="pn">' + esc(project) + '</span></div>' +
+          '<div class="pbox-bd">';
+  var sorted = list.slice().sort(byTime);
+  sorted.forEach(function(r){ h += entHtml(r); });
+  return h + '</div></div>';
 }
 
 /* 一个区块：按子项目拆分成方框 */
@@ -1126,14 +1485,6 @@ function fillSection(elId, type, items){
   el.innerHTML = html;
 }
 
-function projBox(project, type, list){
-  var h = '<div class="pbox t-' + type + '"><div class="pbox-hd"><span class="pn">' + esc(project) + '</span></div>' +
-          '<div class="pbox-bd">';
-  var sorted = list.slice().sort(byTime);
-  sorted.forEach(function(r){ h += entHtml(r); });
-  return h + '</div></div>';
-}
-
 function entHtml(r){
   var h = '<div class="ent">' +
           '<div class="ent-ops no-print">' +
@@ -1144,6 +1495,7 @@ function entHtml(r){
     h += '<div class="ent-hd"><div class="tk">' + esc(r.task) + '</div></div>';
   }
   Object.keys(r.data || {}).forEach(function(k){
+    if(k === '问题与风险') return;  // 问题/风险已在台账看板展示
     var v = r.data[k];
     if(v === '' || v == null) return;
     h += '<div class="kv"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v) + '</div></div>';
@@ -1186,6 +1538,32 @@ function closeConfirm(){
   });
 });
 cbOk.addEventListener('click', function(){
+  // 优先处理：标记问题已解决
+  if(pendingResolveId){
+    var rid = pendingResolveId;
+    pendingResolveId = null;
+    closeConfirm();
+    updateIssue(rid, function(iss){
+      iss.coord = 'resolved';
+      iss.resolvedAt = today();
+      iss.updatedAt = new Date().toISOString();
+      iss.timeline = iss.timeline || [];
+      iss.timeline.push({ t: today(), txt: '已解决' });
+    });
+    renderIssueBoard();
+    toast('已标记解决');
+    return;
+  }
+  // 删除问题台账条目
+  if(pendingIssueDelId){
+    var iid = pendingIssueDelId;
+    pendingIssueDelId = null;
+    closeConfirm();
+    removeIssue(iid);
+    renderIssueBoard();
+    toast('已删除该问题');
+    return;
+  }
   var delIds = pendingDelIds;
   if(!delIds || !delIds.length) return;
   closeConfirm();
@@ -1195,6 +1573,10 @@ cbOk.addEventListener('click', function(){
   delIds.forEach(function(x){ delSet[x] = 1; });
   saveAll(all.filter(function(r){ return !delSet[r.id]; }));
   saveDeletedIds(uniqueIds(loadDeletedIds().concat(delIds)));
+  // 清理关联的问题台账条目
+  var iss = loadIssues();
+  iss.forEach(function(x){ if(x.logId && delSet[x.logId]) x.deleted = true; });
+  saveIssues(iss);
   renderSummary(); refreshCounts(); toast('已删除');
   syncLogbook(delIds, function(ok){
     if(ok){
@@ -1212,6 +1594,97 @@ cbCancel.addEventListener('click', closeConfirm);
 confirmBox.addEventListener('click', function(e){
   if(e.target === confirmBox) closeConfirm();
 });
+
+/* ===== 问题台账看板：交互 ===== */
+function findIssue(id){
+  var arr = loadIssues();
+  for(var i=0;i<arr.length;i++){ if(arr[i].id === id) return arr[i]; }
+  return null;
+}
+/* 读取台账数组 → 修改某条 → 存回同一数组（避免引用失效导致丢失） */
+function updateIssue(id, mutator){
+  var arr = loadIssues();
+  for(var i=0;i<arr.length;i++){
+    if(arr[i].id === id){ mutator(arr[i]); saveIssues(arr); return true; }
+  }
+  return false;
+}
+function removeIssue(id){
+  var arr = loadIssues();
+  for(var i=0;i<arr.length;i++){
+    if(arr[i].id === id){ arr[i].deleted = true; break; }
+  }
+  saveIssues(arr);
+}
+document.getElementById('issue-list').addEventListener('click', function(e){
+  var opBtn = e.target.closest('[data-iss-op]');
+  if(!opBtn) return;
+  var card = opBtn.closest('.icard');
+  if(!card) return;
+  var id = card.dataset.issid;
+  var op = opBtn.dataset.issOp;
+  if(op === 'progress'){
+    openIssueInline(id);
+  } else if(op === 'delete'){
+    openIssueConfirm(id);
+  } else if(op === 'resolve'){
+    openResolveConfirm(id);
+  }
+});
+function openIssueInline(id){
+  var card = document.querySelector('.icard[data-issid="'+id+'"]');
+  if(!card) return;
+  // 已有输入框则先移除
+  card.querySelectorAll('.ii-inline').forEach(function(x){ x.remove(); });
+  var inline = document.createElement('div');
+  inline.className = 'ii-inline no-print';
+  inline.innerHTML =
+    '<textarea class="ii-txt" placeholder="填写最新进展，如：已联系供应商，回复下周一到货"></textarea>' +
+    '<div class="row">' +
+      '<button class="btn plain ii-cancel">取消</button>' +
+      '<button class="btn primary ii-confirm">保存进展</button>' +
+    '</div>';
+  card.appendChild(inline);
+  inline.querySelector('.ii-txt').focus();
+}
+document.getElementById('issue-list').addEventListener('click', function(e){
+  var cancel = e.target.closest('.ii-cancel');
+  if(cancel){
+    cancel.closest('.ii-inline').remove();
+    return;
+  }
+  var confirm = e.target.closest('.ii-confirm');
+  if(!confirm) return;
+  var inline = confirm.closest('.ii-inline');
+  var card = confirm.closest('.icard');
+  if(!card) return;
+  var id = card.dataset.issid;
+  var txt = (inline.querySelector('.ii-txt').value || '').trim();
+  if(!txt){ toast('请填写进展内容'); return; }
+  var nowD = today();
+  var ok = updateIssue(id, function(iss){
+    iss.coord = 'doing';
+    iss.updatedAt = new Date().toISOString();
+    iss.timeline = iss.timeline || [];
+    iss.timeline.push({ t: nowD, txt: txt });
+  });
+  if(ok){ toast('进展已保存'); renderIssueBoard(); }
+});
+
+/* 删除问题（复用确认弹框） */
+var pendingIssueDelId = null;
+function openIssueConfirm(id){
+  pendingIssueDelId = id;
+  cbMsg.textContent = '确认删除这条问题？删除后将从台账中移除。';
+  confirmBox.classList.add('show');
+}
+/* 标记已解决（复用确认弹框） */
+var pendingResolveId = null;
+function openResolveConfirm(id){
+  pendingResolveId = id;
+  cbMsg.textContent = '确认该问题已解决？确认后状态标记为「已解决」。';
+  confirmBox.classList.add('show');
+}
 
 /* ===== 导出 PDF ===== */
 document.getElementById('sum-print').addEventListener('click', function(){
@@ -1240,6 +1713,7 @@ function appStart(){
   var w = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
   document.getElementById('todayText').textContent =
     (d.getMonth()+1) + '月' + d.getDate() + '日 ' + w;
+  ['office','site','accept'].forEach(function(t){ resetIssues(t); });
   refreshCounts();
   renderSummary();
   syncLogbook();
