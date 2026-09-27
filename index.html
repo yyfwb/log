@@ -190,10 +190,10 @@ select:disabled{color:var(--txt3);background-color:#f5f7fa;}
 .icard .meta{font-size:12px;color:var(--txt3);margin-bottom:7px;}
 .icard .meta b{color:var(--txt2);font-weight:600;}
 .timeline{margin:8px 0 2px;}
-.tl-item{display:flex;gap:8px;font-size:12.5px;color:var(--txt2);line-height:1.5;padding:2px 0;}
-.tl-item .dot{flex:none;width:6px;height:6px;border-radius:50%;background:#c3cbe0;margin-top:7px;}
-.tl-item .t{flex:none;color:var(--txt3);font-size:11.5px;margin-top:1px;}
-.tl-item .c{flex:1;word-break:break-word;}
+.tl-item{display:flex;gap:8px;font-size:14.5px;color:var(--txt2);line-height:1.55;padding:2px 0;}
+.tl-item .dot{flex:none;width:6px;height:6px;border-radius:50%;background:#c3cbe0;margin-top:8px;}
+.tl-item .t{flex:none;color:var(--txt3);font-size:12px;margin-top:2px;}
+.tl-item .c{flex:1;word-break:break-word;color:var(--txt);}
 .icard-ops{display:flex;gap:8px;margin-top:9px;}
 .icard-ops .op{flex:1;height:38px;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px;}
 .op-progress{background:#fff;border:1px solid #c9daff;color:var(--blue);}
@@ -367,10 +367,13 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   .stats{grid-template-columns:repeat(4,1fr);}
   body{background:#fff;padding:0;}
   .card,.rec,.tbl-wrap,.empty,.pbox,.stat{border-color:#ddd;box-shadow:none;break-inside:avoid;}
+  .sec-title{break-after:avoid;}
+  .issue-board{break-inside:avoid;}
+  #sum-office,#sum-site,#sum-accept{break-inside:avoid;}
   .kv .v{font-size:16px;line-height:1.65;}
   .icard .desc{font-size:16px;line-height:1.6;}
   .tl-item{font-size:16px;}
-  .tl-item .t{font-size:14px;}
+  .tl-item .t{font-size:12px;}
   @page{margin:14mm 12mm;}
 }
 </style>
@@ -1379,7 +1382,7 @@ function renderSummary(){
   var d = sumDate.value || shiftYmd(today(), -1);
   sumDate.value = d;
   sumNext.disabled = (d >= today());
-  sumHead.textContent = '转播技术组日志 · 当日汇总　' + d + ' ' + weekOf(d);
+  sumHead.textContent = '转播技术组日志　' + d + ' ' + weekOf(d);
   sumTitleDate.textContent = d + ' ' + weekOf(d);
   var items = loadAll().filter(function(r){ return r.date === d; });
   renderIssueBoard();
@@ -1687,9 +1690,15 @@ function openResolveConfirm(id){
 }
 
 /* ===== 导出 PDF ===== */
+function exportFileName(d){
+  // 由日志日期（而非导出当天）生成文件名：转播技术组 + MMDD
+  var a = String(d || '').split('-');
+  if(a.length !== 3) return '转播技术组日志';
+  return '转播技术组' + a[1] + a[2];
+}
 document.getElementById('sum-print').addEventListener('click', function(){
   var oldTitle = document.title;
-  document.title = '';
+  document.title = exportFileName(sumDate.value);
   var restore = function(){
     document.title = oldTitle;
     window.removeEventListener('afterprint', restore);
