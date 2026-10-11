@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#1a6dff">
 <meta name="format-detection" content="telephone=no">
 <title>转播技术组日志</title>
-<script src="https://unpkg.com/cos-js-sdk-v5@1.8.6/dist/cos-js-sdk-v5.min.js"></script>
 <style>
 :root{
   --bg:#f2f4f8; --card:#ffffff; --line:#e5e9f1; --line2:#eef1f7;
@@ -109,7 +108,7 @@ select{
   background-repeat:no-repeat;background-position:right 12px center;background-size:18px;padding-right:38px;
 }
 textarea{resize:vertical;min-height:104px;line-height:1.65;padding-top:12px;font-size:16px;}
-#office-content,#site-content,#accept-content{min-height:208px;}
+#office-content,#site-content{min-height:208px;}
 input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,109,255,.11);}
 select:disabled{color:var(--txt3);background-color:#f5f7fa;}
 .project-custom{margin-top:8px;}
@@ -196,6 +195,8 @@ select:disabled{color:var(--txt3);background-color:#f5f7fa;}
 .tl-item .c{flex:1;word-break:break-word;color:var(--txt);}
 .icard-ops{display:flex;gap:8px;margin-top:9px;}
 .icard-ops .op{flex:1;height:38px;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px;}
+.op-edit{background:#fff;border:1px solid #d5dae2;color:var(--txt2);}
+.op-edit:active{background:#f1f5fb;}
 .op-progress{background:#fff;border:1px solid #c9daff;color:var(--blue);}
 .op-progress:active{background:var(--blue-bg);}
 .op-resolve{background:#e7f8ef;border:1px solid #bfe6cf;color:var(--green);}
@@ -243,7 +244,6 @@ select:disabled{color:var(--txt3);background-color:#f5f7fa;}
 .sec-title::before{content:'';width:8px;height:8px;border-radius:3px;background:var(--txt3);flex:none;}
 .sec-title.office::before{background:var(--blue);}
 .sec-title.site::before{background:var(--orange);}
-.sec-title.accept::before{background:var(--green);}
 .tbl-wrap{background:#fff;border:1px solid var(--line);border-radius:13px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:340px;}
 th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line2);white-space:nowrap;}
@@ -257,7 +257,6 @@ tr.total td{background:#f7f9fd;font-weight:600;}
 .tag{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:20px;flex:none;}
 .tag.office{background:var(--blue-bg);color:var(--blue-d);}
 .tag.site{background:var(--orange-bg);color:#9a5409;}
-.tag.accept{background:var(--green-bg);color:var(--green);}
 .rec-hd .nm{font-size:15px;font-weight:600;}
 .rec-hd .tk{font-size:12.5px;color:var(--txt3);}
 .rec-hd .del{margin-left:auto;font-size:12.5px;color:var(--red);padding:4px 8px;border-radius:8px;flex:none;}
@@ -287,7 +286,6 @@ tr.total td{background:#f7f9fd;font-weight:600;}
 .tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
 .tab.active{color:var(--blue);}
 .tab[data-page=site].active{color:var(--orange);}
-.tab[data-page=accept].active{color:var(--green);}
 .tab[data-page=summary].active{color:var(--purple);}
 
 /* ============ 提示 / 灯箱 ============ */
@@ -315,6 +313,43 @@ tr.total td{background:#f7f9fd;font-weight:600;}
 .cb-cancel{background:#f1f5fb;color:var(--txt2);}
 .cb-cancel:active{background:#e4eaf3;}
 
+/* ============ 问题台账：编辑弹框 ============ */
+#issue-edit-box{position:fixed;inset:0;background:rgba(10,17,29,.45);display:none;align-items:center;justify-content:center;z-index:121;padding:20px;}
+#issue-edit-box.show{display:flex;}
+.ieb-inner{background:#fff;border-radius:16px;width:100%;max-width:420px;max-height:86vh;overflow-y:auto;padding:20px 18px 16px;box-shadow:0 20px 50px -12px rgba(0,0,0,.35);}
+.ieb-title{font-size:16px;color:var(--txt);font-weight:700;margin-bottom:14px;text-align:center;}
+.ieb-field{margin-bottom:13px;}
+.ieb-field .ii-head{font-size:12px;color:var(--txt3);margin-bottom:6px;font-weight:600;letter-spacing:.3px;}
+.ieb-field textarea,.ieb-field input[type=text],.ieb-field select{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 11px;font-size:15px;font-family:inherit;background:#fff;color:var(--txt);box-sizing:border-box;}
+.ieb-field textarea{min-height:76px;resize:vertical;}
+.ieb-field select{min-height:44px;}
+.ieb-risk{display:flex;gap:7px;}
+.ieb-risk .risk-pill{flex:1;height:42px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #e2e6ec;background:#fafbfc;color:var(--txt2);font-size:14px;cursor:pointer;}
+.ieb-risk .risk-pill.on-hi{background:#fdecec;border-color:#f2c3c1;color:#c0392b;font-weight:600;}
+.ieb-risk .risk-pill.on-mid{background:#fff3e2;border-color:#f0d0a5;color:#b35c00;font-weight:600;}
+.ieb-risk .risk-pill.on-low{background:#fffbe8;border-color:#ecdfa8;color:#8a7a1f;font-weight:600;}
+.ieb-btns{display:flex;gap:10px;margin-top:16px;}
+.ieb-btn{flex:1;height:44px;border-radius:11px;font-size:15px;font-weight:600;border:none;cursor:pointer;}
+.ieb-save{background:var(--blue);color:#fff;}
+.ieb-save:active{background:#2067d6;}
+.ieb-cancel{background:#f1f5fb;color:var(--txt2);}
+.ieb-cancel:active{background:#e4eaf3;}
+/* 进展时间线（编辑弹窗内） */
+.ieb-timeline{margin-bottom:8px;}
+.ieb-tl-item{display:flex;gap:8px;align-items:flex-start;border:1px solid #ececec;border-radius:10px;padding:8px 9px;margin-bottom:8px;background:#fafbfc;}
+.ieb-tl-time{flex:none;font-size:12px;color:var(--txt3);padding-top:7px;min-width:44px;}
+.ieb-tl-body{flex:1;min-width:0;}
+.ieb-tl-txt{width:100%;border:1px solid transparent;border-radius:8px;padding:7px 9px;font-size:14px;font-family:inherit;color:var(--txt);background:#fff;box-sizing:border-box;resize:vertical;min-height:38px;line-height:1.45;}
+.ieb-tl-txt:hover{border-color:#d5dae2;}
+.ieb-tl-txt:focus{border-color:var(--blue);outline:none;}
+.ieb-tl-del{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid #f3d5d2;background:#fff;color:var(--red);font-size:16px;line-height:1;cursor:pointer;margin-top:4px;}
+.ieb-tl-del:active{background:#fdecea;}
+.ieb-tl-empty{font-size:12.5px;color:var(--txt3);padding:6px 2px;}
+.ieb-tl-add{margin-top:4px;}
+.ieb-tl-add textarea{width:100%;min-height:56px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--txt);box-sizing:border-box;resize:vertical;background:#fff;}
+.ieb-tl-add-btn{margin-top:7px;height:38px;padding:0 16px;border-radius:10px;border:1px solid #c9daff;background:#fff;color:var(--blue);font-size:13.5px;font-weight:600;cursor:pointer;}
+.ieb-tl-add-btn:active{background:var(--blue-bg);}
+
 /* ============ 汇总：日期导航 ============ */
 .print-head{display:none;}
 .datebar{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin-bottom:12px;}
@@ -331,7 +366,6 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   border-radius:14px;margin-bottom:12px;overflow:hidden;}
 .pbox.t-office{border-left-color:var(--blue);}
 .pbox.t-site{border-left-color:var(--orange);}
-.pbox.t-accept{border-left-color:var(--green);}
 .pbox-hd{display:flex;align-items:center;gap:8px;padding:12px 13px;background:#fafcfe;border-bottom:1px solid var(--line2);}
 .pbox-hd .pn{font-size:16px;font-weight:600;flex:1;word-break:break-word;}
 .pbox-hd .pc{font-size:12px;color:var(--txt3);flex:none;text-align:right;}
@@ -369,7 +403,7 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   .card,.rec,.tbl-wrap,.empty,.pbox,.stat{border-color:#ddd;box-shadow:none;break-inside:avoid;}
   .sec-title{break-after:avoid;}
   .issue-board{break-inside:avoid;}
-  #sum-office,#sum-site,#sum-accept{break-inside:avoid;}
+  #sum-office,#sum-site{break-inside:avoid;}
   .kv .v{font-size:16px;line-height:1.65;}
   .icard .desc{font-size:16px;line-height:1.6;}
   .tl-item{font-size:16px;}
@@ -501,65 +535,7 @@ tr.total td{background:#f7f9fd;font-weight:600;}
     </div>
   </section>
 
-  <!-- ============ 3 验收日志 ============ -->
-  <section class="page" id="page-accept">
-    <div class="page-head">
-      <h2>验收日志</h2>
-      <label class="yday" data-yday="accept"><input type="checkbox"><span class="dot"></span>补报昨天</label>
-      <span class="count" id="cnt-accept">今日 0 条</span>
-    </div>
-
-    <div class="card">
-      <div class="field">
-        <label class="lb" for="accept-project">子项目 <em>*</em></label>
-        <select id="accept-project"></select>
-        <input type="text" id="accept-project-custom" class="project-custom" placeholder="请输入子项目名称" style="display:none;">
-      </div>
-      <div class="field">
-        <label class="lb" for="accept-content">验收内容</label>
-        <textarea id="accept-content"></textarea>
-      </div>
-      <div class="field">
-        <label class="lb" for="accept-result">验收结论 <em>*</em></label>
-        <select id="accept-result">
-          <option value="">请选择</option>
-          <option>合格</option>
-          <option>整改后合格</option>
-          <option>不合格</option>
-        </select>
-      </div>
-      <div class="field">
-        <label class="lb">问题与风险/协调进度 <span class="opt">可添加多条，标注风险与协调进度</span></label>
-        <div class="issues" id="accept-issues"></div>
-        <button class="ii-add" type="button" data-add-issue="accept">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-          添加问题/风险
-        </button>
-      </div>
-      <div class="field">
-        <label class="lb">验收照片 <span class="opt">可多张</span></label>
-        <div class="pbtns">
-          <button class="pbtn" data-pick="accept-cam">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A2 2 0 0 1 5 6.5h1.6l1.2-2h8.4l1.2 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></svg>
-            拍照
-          </button>
-          <button class="pbtn ghost" data-pick="accept-alb">从相册选择</button>
-        </div>
-        <input type="file" id="accept-cam" accept="image/*" capture="environment" hidden>
-        <input type="file" id="accept-alb" accept="image/*" multiple hidden>
-        <div class="thumbs" id="accept-thumbs"></div>
-      </div>
-    </div>
-
-    <div class="actions">
-      <div class="row2 fill">
-        <button class="btn plain" data-reset="accept">清空重填</button>
-        <button class="btn primary g" id="accept-submit">提交</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 4 当日汇总 ============ -->
+  <!-- ============ 3 当日汇总 ============ -->
   <!-- ============ 4 当日汇总 ============ -->
   <section class="page" id="page-summary">
     <div class="print-head" id="sum-printhead"></div>
@@ -588,9 +564,6 @@ tr.total td{background:#f7f9fd;font-weight:600;}
     <div class="sec-title site">施工日志</div>
     <div id="sum-site"></div>
 
-    <div class="sec-title accept">验收日志</div>
-    <div id="sum-accept"></div>
-
     <div class="actions no-print">
       <button class="btn primary" id="sum-print">导出 PDF</button>
     </div>
@@ -606,10 +579,6 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   <button class="tab" data-page="site">
     <svg viewBox="0 0 24 24"><path d="M4.2 15.4a7.8 7.8 0 0 1 15.6 0"/><path d="M2.6 15.4h18.8v3.4H2.6z"/><path d="M12 7.6V4.2"/><path d="M9.6 4.2h4.8"/></svg>
     <span>施工日志</span>
-  </button>
-  <button class="tab" data-page="accept">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M8.2 12.3l2.6 2.6 4.9-5.2"/></svg>
-    <span>验收日志</span>
   </button>
   <button class="tab" data-page="summary">
     <svg viewBox="0 0 24 24"><path d="M3.5 20.4h17"/><path d="M6.8 20.4v-6.6"/><path d="M12 20.4V6.4"/><path d="M17.2 20.4v-9.6"/></svg>
@@ -629,6 +598,40 @@ tr.total td{background:#f7f9fd;font-weight:600;}
   </div>
 </div>
 
+<div id="issue-edit-box">
+  <div class="ieb-inner">
+    <div class="ieb-title">编辑问题 / 风险</div>
+    <div class="ieb-field"><div class="ii-head">问题 / 风险描述</div>
+      <textarea id="ieb-desc" placeholder="描述问题或风险，如：10KV电缆桥架缺货，影响通电节点"></textarea></div>
+    <div class="ieb-field"><div class="ii-head">风险等级</div>
+      <div class="ieb-risk" id="ieb-risk">
+        <button type="button" class="risk-pill" data-risk="高">高</button>
+        <button type="button" class="risk-pill" data-risk="中">中</button>
+        <button type="button" class="risk-pill" data-risk="低">低</button>
+      </div></div>
+    <div class="ieb-field"><div class="ii-head">协调状态</div>
+      <select id="ieb-coord">
+        <option value="todo">待协调</option>
+        <option value="doing">协调中</option>
+        <option value="resolved">已解决</option>
+      </select></div>
+    <div class="ieb-field"><div class="ii-head">负责人</div>
+      <input type="text" id="ieb-owner" placeholder="谁负责（选填）"></div>
+    <div class="ieb-field"><div class="ii-head">协调对象</div>
+      <input type="text" id="ieb-target" placeholder="与谁协调（选填）"></div>
+    <div class="ieb-field"><div class="ii-head">进展时间线</div>
+      <div id="ieb-timeline" class="ieb-timeline"></div>
+      <div class="ieb-tl-add">
+        <textarea id="ieb-tl-add-txt" placeholder="添加新进展，如：已联系供应商，回复下周一到货"></textarea>
+        <button type="button" class="ieb-tl-add-btn" id="ieb-tl-add">添加进展</button>
+      </div></div>
+    <div class="ieb-btns">
+      <button class="ieb-btn ieb-save" id="ieb-save">保存</button>
+      <button class="ieb-btn ieb-cancel" id="ieb-cancel">取消</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ===== 项目任务数据（来自《项目任务清单.xlsx》） ===== */
 var RAW = [{"p":"Mediabuddy项目","t":"需求调研与分析、运营管理端开发","s":"2026-08-01","e":"2026-09-21"},{"p":"Mediabuddy项目","t":"媒体中心前端开发、Work Buddy智能应用","s":"2026-08-23","e":"2026-09-25"},{"p":"Mediabuddy项目","t":"系统开发","s":"2026-09-08","e":"2026-10-14"},{"p":"Mediabuddy项目","t":"订单生成","s":"2026-09-12","e":"2026-09-17"},{"p":"Mediabuddy项目","t":"统一认证开发、接口联调与集成","s":"2026-09-22","e":"2026-09-30"},{"p":"Mediabuddy项目","t":"部署与预上线检查","s":"2026-09-22","e":"2026-10-19"},{"p":"Mediabuddy项目","t":"测试与安全","s":"2026-09-28","e":"2026-10-19"},{"p":"动力系统","t":"物流及通道计划准备","s":"2026-09-05","e":"2026-09-29"},{"p":"动力系统","t":"箱式变压器订货、进场就位安装","s":"2026-09-06","e":"2026-09-30"},{"p":"动力系统","t":"ATS、配电箱改造及补充采购生产落实计划","s":"2026-09-07","e":"2026-09-29"},{"p":"动力系统","t":"一级低压设备配电箱进场就位及安装","s":"2026-09-07","e":"2026-09-30"},{"p":"动力系统","t":"UPS设备户外使用改造及补充采购生产落实计划","s":"2026-09-07","e":"2026-10-15"},{"p":"动力系统","t":"设备舱进场安装、内部装修","s":"2026-09-10","e":"2026-09-25"},{"p":"动力系统","t":"电池就位安装","s":"2026-09-12","e":"2026-09-25"},{"p":"动力系统","t":"低压设备ATS、UPS、末端配电箱柜就位及安装","s":"2026-09-12","e":"2026-09-30"},{"p":"动力系统","t":"低压电缆安装、敷设、防护","s":"2026-09-14","e":"2026-09-23"},{"p":"动力系统","t":"10KV电缆桥架施工安装","s":"2026-09-15","e":"2026-09-29"},{"p":"动力系统","t":"低压电缆接入前测试并接入系统","s":"2026-09-20","e":"2026-09-30"},{"p":"动力系统","t":"安防消缺和改进计划","s":"2026-09-20","e":"2026-11-07"},{"p":"动力系统","t":"多轮迎检和改进计划","s":"2026-09-20","e":"2026-11-07"},{"p":"动力系统","t":"日常应急演练","s":"2026-09-20","e":"2026-11-07"},{"p":"动力系统","t":"10KV电缆进场施工安装","s":"2026-09-21","e":"2026-09-30"},{"p":"动力系统","t":"10KV箱变、10KV电缆预防性试验","s":"2026-09-22","e":"2026-09-26"},{"p":"动力系统","t":"中压系统连接及通电","s":"2026-09-24","e":"2026-09-30"},{"p":"动力系统","t":"测试系统电源应急操作时序控制逻辑","s":"2026-09-30","e":"2026-10-15"},{"p":"动力系统","t":"系统联合测试并分级通电（临时全场通电）","s":"2026-10-01","e":"2026-10-15"},{"p":"动力系统","t":"ATS、UPS等设备试验带载功能（实测加模拟负载试验）","s":"2026-10-01","e":"2026-10-15"},{"p":"动力系统","t":"系统压力测试试验","s":"2026-10-18","e":"2026-10-31"},{"p":"1号+2号新闻发布厅","t":"勘场设计、结构搭建、建筑声学测试","s":"2026-09-10","e":"2026-09-20"},{"p":"1号+2号新闻发布厅","t":"视讯EFP系统提前埋线","s":"2026-09-20","e":"2026-09-30"},{"p":"1号+2号新闻发布厅","t":"灯光+音响现场测试、方案调整","s":"2026-09-21","e":"2026-10-11"},{"p":"1号+2号新闻发布厅","t":"全部物料、设备入场、搭建","s":"2026-10-10","e":"2026-10-17"},{"p":"1号+2号新闻发布厅","t":"灯光+音响+视讯系统调试","s":"2026-10-16","e":"2026-10-19"},{"p":"1号+2号新闻发布厅","t":"舞台搭建修复、调整","s":"2026-10-18","e":"2026-10-19"},{"p":"公共素材采集","t":"采访线踏勘","s":"2026-09-10","e":"2026-10-31"},{"p":"公共素材采集","t":"智媒圳品系统集成","s":"2026-09-10","e":"2026-10-31"},{"p":"公共素材采集","t":"公共素材云平台设备集成+测试、5G传输设备系统集成+测试","s":"2026-10-12","e":"2026-10-19"},{"p":"1号常规演播室+XR演播室","t":"音响+视讯+灯光+舞美勘场","s":"2026-09-14","e":"2026-09-25"},{"p":"1号常规演播室+XR演播室","t":"音响+视讯+灯光+舞美搭建、系统搭建、XR屏幕进场","s":"2026-10-10","e":"2026-10-18"},{"p":"1号常规演播室+XR演播室","t":"系统联调","s":"2026-10-16","e":"2026-10-19"},{"p":"屏控系统集成与信号调度","t":"勘场","s":"2026-09-21","e":"2026-10-04"},{"p":"屏控系统集成与信号调度","t":"进场搭建","s":"2026-10-05","e":"2026-10-15"},{"p":"屏控系统集成与信号调度","t":"系统联调","s":"2026-10-16","e":"2026-10-19"},{"p":"综合布线","t":"现场测量定位","s":"2026-08-25","e":"2026-08-27"},{"p":"综合布线","t":"材料进场同步办理入库","s":"2026-08-25","e":"2026-08-28"},{"p":"综合布线","t":"配电箱定位安装","s":"2026-08-28","e":"2026-09-01"},{"p":"综合布线","t":"网线、电源线、光缆铺设","s":"2026-09-01","e":"2026-09-25"},{"p":"综合布线","t":"隔墙底盒安装","s":"2026-09-09","e":"2026-09-13"},{"p":"综合布线","t":"机房配线架理线架安装","s":"2026-09-23","e":"2026-09-29"},{"p":"综合布线","t":"地板开孔上线","s":"2026-09-25","e":"2026-09-29"},{"p":"综合布线","t":"网络跳线","s":"2026-09-26","e":"2026-10-03"},{"p":"综合布线","t":"AP安装","s":"2026-09-27","e":"2026-10-03"},{"p":"综合布线","t":"光纤熔接","s":"2026-09-29","e":"2026-10-01"},{"p":"综合布线","t":"标签打印制作","s":"2026-10-05","e":"2026-10-09"},{"p":"综合布线","t":"电源插座、网络面板，光纤面板安装","s":"2026-10-07","e":"2026-10-13"},{"p":"综合布线","t":"强弱电线缆测试","s":"2026-10-17","e":"2026-10-19"},{"p":"综合布线","t":"设备联调","s":"2026-10-17","e":"2026-10-19"},{"p":"总控及播出","t":"供货清单核对与调整","s":"2026-09-14","e":"2026-09-20"},{"p":"总控及播出","t":"甲方供货设备整理与检测（包括特殊接头的收集）","s":"2026-09-14","e":"2026-09-27"},{"p":"总控及播出","t":"播控流程核对","s":"2026-09-14","e":"2026-09-27"},{"p":"总控及播出","t":"电视墙支架安装方案落实与配件生产","s":"2026-09-14","e":"2026-09-30"},{"p":"总控及播出","t":"施工图纸核对与调整","s":"2026-09-14","e":"2026-10-04"},{"p":"总控及播出","t":"甲方提供的播控服务器和工作站的操作系统和基础软件安装（包括Moxa卡安装）","s":"2026-09-21","e":"2026-09-30"},{"p":"总控及播出","t":"总控前置规划筹备工作（电视墙画分布局设计、总控播出系统信号命名落实、总控矩阵10个矩阵面板输入输出按键规划、局域网IP地址规划）","s":"2026-09-21","e":"2026-10-04"},{"p":"总控及播出","t":"会场CTA机房与MCR之间提前布设16根网线","s":"2026-09-21","e":"2026-10-04"},{"p":"总控及播出","t":"甲方供货设备搬运至会场","s":"2026-09-28","e":"2026-10-01"},{"p":"总控及播出","t":"机柜厂家提供机柜螺丝螺母和托架","s":"2026-09-28","e":"2026-10-04"},{"p":"总控及播出","t":"播出与媒体系统调试","s":"2026-10-02","e":"2026-10-31"},{"p":"总控及播出","t":"CTA机房和MCR房设备安装、汇聚点机房设备安装","s":"2026-10-05","e":"2026-10-09"},{"p":"总控及播出","t":"电视墙安装","s":"2026-10-05","e":"2026-10-11"},{"p":"总控及播出","t":"乙方供货的设备与线材到货与搬运入库","s":"2026-10-05","e":"2026-10-20"},{"p":"总控及播出","t":"业务培训","s":"2026-10-05","e":"2026-11-10"},{"p":"总控及播出","t":"MCR电视墙通电点亮","s":"2026-10-10","e":"2026-10-11"},{"p":"总控及播出","t":"总控矩阵面板设置","s":"2026-10-10","e":"2026-10-11"},{"p":"总控及播出","t":"单机调试（同步机，时钟设备，播出延时器）","s":"2026-10-10","e":"2026-10-11"},{"p":"总控及播出","t":"CTA机房视音频线和控制线连接与绑扎","s":"2026-10-10","e":"2026-10-20"},{"p":"总控及播出","t":"单机调试（总控画分设备）","s":"2026-10-10","e":"2026-10-20"},{"p":"总控及播出","t":"MCR房视音频线和控制线连接与绑扎","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"CTA机房光端传输光纤线连接与绑扎","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"会场各区域点位视音频线和光纤线连接与绑扎","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"多芯控制线接头焊接","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"各房间电源线接入与绑扎","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"系统标签制作","s":"2026-10-12","e":"2026-10-20"},{"p":"总控及播出","t":"总控矩阵调整和输入输出跳线通道检查","s":"2026-10-12","e":"2026-10-25"},{"p":"总控及播出","t":"单机调试（播出切换台，播出多选一，播出画分，12G视分和帧同步）","s":"2026-10-12","e":"2026-10-25"},{"p":"总控及播出","t":"单机调试（环路处理设备-SNP和X85）","s":"2026-10-12","e":"2026-10-31"},{"p":"总控及播出","t":"单机调试（SRT设备）","s":"2026-10-12","e":"2026-10-31"},{"p":"总控及播出","t":"光端传输设备调试与各区光传信号通路检查","s":"2026-10-21","e":"2026-10-25"},{"p":"总控及播出","t":"总控/播出/媒资系统联调和指标测试","s":"2026-10-26","e":"2026-10-26"},{"p":"总控及播出","t":"根据实际的应用场景调整各工位矩阵面板的按键布局","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"总控/播出/媒资系统功能验证","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"控/播出/媒资系统全流程演练","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"总控/播出/媒资系统稳定性与压力测试","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"故障模拟与应急演练","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"根据使用效果对系统进行微调和问题处理","s":"2026-11-01","e":"2026-11-10"},{"p":"总控及播出","t":"正式运行与重点保障","s":"2026-11-11","e":"2026-11-20"},{"p":"总控及播出","t":"撤场","s":"2026-11-21","e":"2026-11-28"},{"p":"信息技术系统","t":"信息发布系统需求确认以及高保真交互原型输出","s":"2026-07-13","e":"2026-07-13"},{"p":"信息技术系统","t":"IBC系统需需求确认以及高保真交互原型输出","s":"2026-07-13","e":"2026-07-13"},{"p":"信息技术系统","t":"信息发布系统技术框架搭建","s":"2026-08-13","e":"2026-08-13"},{"p":"信息技术系统","t":"IBC系统web后台及记者端技术框架搭建","s":"2026-08-13","e":"2026-08-13"},{"p":"信息技术系统","t":"信息发布系统具体功能实现","s":"2026-08-25","e":"2026-08-25"},{"p":"信息技术系统","t":"IBC系统web后台及记者端具体功能实现","s":"2026-08-25","e":"2026-09-30"},{"p":"信息技术系统","t":"服务资源、预约流程、收费方案确定","s":"2026-09-07","e":"2026-09-20"},{"p":"信息技术系统","t":"UI视觉设计","s":"2026-09-30","e":"2026-09-30"},{"p":"信息技术系统","t":"信息发布系统和IBC系统视觉及细化需求调整","s":"2026-09-30","e":"2026-10-10"},{"p":"信息技术系统","t":"总控及播出频道安装集成","s":"2026-10-05","e":"2026-10-20"},{"p":"信息技术系统","t":"有线电视系统安装集成","s":"2026-10-05","e":"2026-10-20"},{"p":"信息技术系统","t":"信息系统硬件安装集成","s":"2026-10-08","e":"2026-10-20"},{"p":"信息技术系统","t":"运行管理系统功能测试、流程测试","s":"2026-10-11","e":"2026-10-20"},{"p":"信息技术系统","t":"LED大屏安装","s":"2026-10-20","e":"2026-10-20"},{"p":"信息技术系统","t":"多系统联调测试","s":"2026-10-21","e":"2026-10-21"},{"p":"信息技术系统","t":"会议发布系统上屏及功能测试","s":"2026-10-21","e":"2026-10-22"},{"p":"信息技术系统","t":"系统上线试运行","s":"2026-11-01","e":"2026-11-01"},{"p":"信息技术系统","t":"系统正式试运行","s":"2026-11-11","e":"2026-11-11"},{"p":"信息技术系统","t":"撤场","s":"2026-11-21","e":"2026-11-28"},{"p":"音频监听系统","t":"软件基础版本开发","s":"2026-09-21","e":"2026-09-29"},{"p":"音频监听系统","t":"发布厅音频布线","s":"2026-09-28","e":"2026-09-30"},{"p":"音频监听系统","t":"软件UI设计","s":"2026-09-30","e":"2026-10-20"},{"p":"音频监听系统","t":"CTA机房和MCR房设备安装集成","s":"2026-10-05","e":"2026-10-15"},{"p":"音频监听系统","t":"总控及播出频道安装集成","s":"2026-10-05","e":"2026-10-20"},{"p":"音频监听系统","t":"有线电视系统安装集成","s":"2026-10-05","e":"2026-10-20"},{"p":"音频监听系统","t":"系统网络设置","s":"2026-10-16","e":"2026-10-20"},{"p":"XR制作系统","t":"摇臂及跟踪系统培训","s":"2026-09-14","e":"2026-09-30"},{"p":"XR制作系统","t":"8楼XR设备清点、打包","s":"2026-09-18","e":"2026-10-07"},{"p":"XR制作系统","t":"XR场景开发","s":"2026-09-21","e":"2026-09-30"},{"p":"XR制作系统","t":"XR场景测试","s":"2026-10-01","e":"2026-10-20"},{"p":"XR制作系统","t":"演播室视音频、灯光设备安装集成","s":"2026-10-08","e":"2026-10-20"},{"p":"XR制作系统","t":"LED大屏拆卸","s":"2026-10-13","e":"2026-10-13"},{"p":"XR制作系统","t":"LED大屏安装","s":"2026-10-14","e":"2026-10-16"},{"p":"XR制作系统","t":"XR设备运输进场及安装","s":"2026-10-18","e":"2026-10-20"},{"p":"XR制作系统","t":"XR系统调试（跟踪、校色）","s":"2026-10-21","e":"2026-10-31"},{"p":"XR制作系统","t":"系统上线试运行","s":"2026-11-01","e":"2026-11-10"},{"p":"XR制作系统","t":"正式运行","s":"2026-11-11","e":"2026-11-21"},{"p":"XR制作系统","t":"撤场","s":"2026-11-21","e":"2026-11-28"},{"p":"XR制作系统","t":"设备清点","s":"2026-11-29","e":"2026-11-30"},{"p":"XR制作系统","t":"设备、系统复原","s":"2026-11-30","e":"2026-12-08"},{"p":"网络设备（华为）","t":"前期方案确认","s":"2026-09-10","e":"2026-09-24"},{"p":"网络设备（华为）","t":"进场与搭建","s":"2026-09-25","e":"2026-10-20"},{"p":"网络设备（华为）","t":"系统调试","s":"2026-10-08","e":"2026-11-10"},{"p":"联通出口带宽项目","t":"2.1光缆工程设计","s":"2026-09-10","e":"2026-09-13"},{"p":"联通出口带宽项目","t":"2.2传输设备工程设计","s":"2026-09-10","e":"2026-09-13"},{"p":"联通出口带宽项目","t":"1.1项目立项","s":"2026-09-10","e":"2026-09-18"},{"p":"联通出口带宽项目","t":"3.1方案编制并定稿","s":"2026-09-10","e":"2026-09-18"},{"p":"联通出口带宽项目","t":"2.3设备选型","s":"2026-09-11","e":"2026-09-11"},{"p":"联通出口带宽项目","t":"4.2.1市政管道报租","s":"2026-09-14","e":"2026-09-16"},{"p":"联通出口带宽项目","t":"4.2光缆工程","s":"2026-09-14","e":"2026-09-29"},{"p":"联通出口带宽项目","t":"4.3.1设备采购","s":"2026-09-15","e":"2026-10-08"},{"p":"联通出口带宽项目","t":"4.3传输设备工程","s":"2026-09-15","e":"2026-10-13"},{"p":"联通出口带宽项目","t":"2.4设计评审","s":"2026-09-16","e":"2026-09-16"},{"p":"联通出口带宽项目","t":"4.2.2光缆敷设","s":"2026-09-17","e":"2026-09-24"},{"p":"联通出口带宽项目","t":"6.1OOP工单流程审批","s":"2026-09-19","e":"2026-09-30"},{"p":"联通出口带宽项目","t":"4.2.3光缆成端","s":"2026-09-28","e":"2026-09-29"},{"p":"联通出口带宽项目","t":"4.3.2设备安装","s":"2026-10-08","e":"2026-10-11"},{"p":"联通出口带宽项目","t":"6.2联通盾服务开通","s":"2026-10-08","e":"2026-10-16"},{"p":"联通出口带宽项目","t":"4.3.3设备调试上载","s":"2026-10-12","e":"2026-10-13"},{"p":"联通出口带宽项目","t":"5.1传输资源配置","s":"2026-10-14","e":"2026-10-15"},{"p":"联通出口带宽项目","t":"5.2数据资源配置","s":"2026-10-14","e":"2026-10-15"},{"p":"联通出口带宽项目","t":"5.3语音资源配置","s":"2026-10-14","e":"2026-10-15"},{"p":"联通出口带宽项目","t":"5.4光路跳纤","s":"2026-10-16","e":"2026-10-16"},{"p":"联通出口带宽项目","t":"5.5开通联调测试","s":"2026-10-17","e":"2026-10-19"},{"p":"联通出口带宽项目","t":"7.1项目试运行","s":"2026-10-21","e":"2026-11-10"},{"p":"联通出口带宽项目","t":"8.1网络运行和重保","s":"2026-11-11","e":"2026-11-21"},{"p":"深信服网络安全项目","t":"赞助与设备投入决策确认","s":"2026-09-10","e":"2026-09-15"},{"p":"深信服网络安全项目","t":"现场勘探与设备材料清单核对","s":"2026-09-14","e":"2026-09-22"},{"p":"深信服网络安全项目","t":"入场合规报备与安全责任书签署","s":"2026-09-14","e":"2026-09-28"},{"p":"深信服网络安全项目","t":"客户网络规划获取+实施方案确认（IP划分/线路）","s":"2026-09-14","e":"2026-09-30"},{"p":"深信服网络安全项目","t":"设备分批到货计划确认","s":"2026-09-16","e":"2026-09-16"},{"p":"深信服网络安全项目","t":"首批设备到货（SIP/探针）","s":"2026-09-17","e":"2026-09-20"},{"p":"深信服网络安全项目","t":"第二批到货（行为管理/审计类/AD/防火墙）","s":"2026-09-20","e":"2026-09-30"},{"p":"深信服网络安全项目","t":"SaaS服务开通（EDR/MSS/XDR）","s":"2026-09-20","e":"2026-10-20"},{"p":"深信服网络安全项目","t":"设备到货验收与资产登记","s":"2026-09-21","e":"2026-09-30"},{"p":"深信服网络安全项目","t":"设备上架与线缆敷设（主馆）","s":"2026-10-08","e":"2026-10-15"},{"p":"深信服网络安全项目","t":"防火墙单机加电与基础配置","s":"2026-10-16","e":"2026-10-20"},{"p":"深信服网络安全项目","t":"探针部署与镜像流量接入","s":"2026-10-16","e":"2026-10-22"},{"p":"深信服网络安全项目","t":"审计类设备部署（日审/数审/堡垒机）","s":"2026-10-16","e":"2026-10-25"},{"p":"深信服网络安全项目","t":"与华三/电信出口联调","s":"2026-10-21","e":"2026-10-25"},{"p":"深信服网络安全项目","t":"AC与派网单点对接（审计留痕）","s":"2026-10-21","e":"2026-10-28"},{"p":"深信服网络安全项目","t":"安全策略配置与优化","s":"2026-10-22","e":"2026-10-30"},{"p":"深信服网络安全项目","t":"5号馆进场与上架","s":"2026-10-26","e":"2026-10-28"},{"p":"深信服网络安全项目","t":"5号馆调试与联调","s":"2026-10-29","e":"2026-10-31"},{"p":"深信服网络安全项目","t":"大流量性能验证（不成为瓶颈）","s":"2026-10-31","e":"2026-11-01"},{"p":"深信服网络安全项目","t":"安全测试与测试报告出具","s":"2026-10-31","e":"2026-11-07"},{"p":"深信服网络安全项目","t":"系统全流程联调与试运行","s":"2026-11-02","e":"2026-11-10"}];
@@ -642,6 +645,11 @@ RAW.forEach(function(r){
 ['鸿蒙演播室','基础周边设施搭建'].forEach(function(p){
   if(PROJECTS.indexOf(p) < 0){ PROJECTS.push(p); TASKS[p] = []; }
 });
+/* 将「1号常规演播室+XR演播室」拆分为两个独立子项目选项（历史日志数据不迁移） */
+(function(){
+  var i = PROJECTS.indexOf('1号常规演播室+XR演播室');
+  if(i >= 0){ PROJECTS.splice(i, 1, '1号常规演播室', 'XR演播室'); }
+})();
 
 /* ===== 存储 ===== */
 var LS_KEY = 'xinwen_logbook_v1';
@@ -658,6 +666,33 @@ var LOG_COS_CONFIG = {
 var LOG_KEY = 'data/logbook/latest.json';
 var logCosClient = null;
 var LS_DELETED_KEY = LS_KEY + '_deleted';
+var cosSdkState = 0; // 0=未加载 1=加载中 2=已就绪 3=失败
+var cosSdkCallbacks = [];
+/* COS SDK 按需异步加载：不阻塞首屏渲染；国内优先走 jsdelivr，失败回退 unpkg */
+function loadCosSDK(cb){
+  if(cb) cosSdkCallbacks.push(cb);
+  if(cosSdkState === 2){ flushCosCallbacks(); return; }
+  if(cosSdkState === 1){ return; }
+  if(cosSdkState === 3){ flushCosCallbacks(); return; }
+  cosSdkState = 1;
+  var urls = [
+    'https://cdn.jsdelivr.net/npm/cos-js-sdk-v5@1.8.6/dist/cos-js-sdk-v5.min.js',
+    'https://unpkg.com/cos-js-sdk-v5@1.8.6/dist/cos-js-sdk-v5.min.js'
+  ];
+  function tryNext(i){
+    if(i >= urls.length){ cosSdkState = 3; flushCosCallbacks(); return; }
+    var s = document.createElement('script');
+    s.src = urls[i];
+    s.onload = function(){ cosSdkState = 2; flushCosCallbacks(); };
+    s.onerror = function(){ tryNext(i + 1); };
+    document.head.appendChild(s);
+  }
+  tryNext(0);
+}
+function flushCosCallbacks(){
+  var cbs = cosSdkCallbacks; cosSdkCallbacks = [];
+  cbs.forEach(function(f){ try{ f(); }catch(e){} });
+}
 function getLogCos(){
   if(!window.COS) return null;
   if(!logCosClient){
@@ -796,13 +831,12 @@ function toast(msg){
 /* ===== 日志类型配置 ===== */
 var CFG = {
   office: { label:'办公日志', fields:[['content','今日工作内容']], photos:true, photoLabel:'照片', issues:true },
-  site:   { label:'施工日志', fields:[['content','施工内容']], photos:true, photoLabel:'现场照片', issues:true },
-  accept: { label:'验收日志', fields:[['content','验收内容'],['result','验收结论']], photos:true, photoLabel:'验收照片', issues:true }
+  site:   { label:'施工日志', fields:[['content','施工内容']], photos:true, photoLabel:'现场照片', issues:true }
 };
-var PHOTOS = { office:[], site:[], accept:[] };
+var PHOTOS = { office:[], site:[] };
 
 /* ===== 问题/风险条目（表单态） ===== */
-var ISSUES = { office:[], site:[], accept:[] };
+var ISSUES = { office:[], site:[] };
 var RISK_LEVELS = ['高','中','低'];
 var COORD_STATES = [
   { v:'todo',  label:'待协调' },
@@ -877,12 +911,12 @@ function fillProjects(sel){
     PROJECTS.map(function(p){ return '<option value="'+esc(p)+'">'+esc(p)+'</option>'; }).join('') +
     '<option value="其他">其他</option>';
 }
-['office','site','accept'].forEach(function(type){
+['office','site'].forEach(function(type){
   fillProjects(document.getElementById(type+'-project'));
 });
 
 /* 子项目选择「其他」时显示自定义名称输入框 */
-['office','site','accept'].forEach(function(type){
+['office','site'].forEach(function(type){
   var sel = document.getElementById(type+'-project');
   var custom = document.getElementById(type+'-project-custom');
   function toggle(){
@@ -987,7 +1021,7 @@ document.querySelectorAll('[data-pick]').forEach(function(btn){
     document.getElementById(id).click();
   });
 });
-['office-cam','office-alb','site-cam','site-alb','accept-cam','accept-alb'].forEach(function(id){
+['office-cam','office-alb','site-cam','site-alb'].forEach(function(id){
   var type = id.split('-')[0];
   document.getElementById(id).addEventListener('change', function(){
     addFiles(type, this.files);
@@ -1050,8 +1084,6 @@ function submitLog(type){
   for(var i=0;i<cfg.fields.length;i++){
     var key = cfg.fields[i][0], label = cfg.fields[i][1];
     var v = (document.getElementById(type+'-'+key).value || '').trim();
-    var required = (type === 'accept' && key === 'result');
-    if(required && !v) return toast('请填写「'+label+'」');
     if(v) data[label] = v;
   }
 
@@ -1066,23 +1098,27 @@ function submitLog(type){
   var fresh = photos.filter(function(p){ return p && !p.key; });
   if(!fresh.length){ finalizeSubmit(type, cfg, project, data, keep); return; }
 
-  var remaining = fresh.length;
-  var failed = false;
-  var refs = new Array(fresh.length);
-  fresh.forEach(function(p, idx){
-    var pid = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,9);
-    uploadPhoto(pid, p.data, p.name, function(err, ref){
-      if(err){ failed = true; }
-      else { refs[idx] = ref; }
-      if(--remaining === 0){
-        var ordered = refs.filter(Boolean);
-        if(failed){
-          ordered.forEach(function(r){ deletePhoto(r.key); });
-          toast('照片上传失败，请检查网络后重试');
-        } else {
-          finalizeSubmit(type, cfg, project, data, keep.concat(ordered));
+  // 确保 COS SDK 就绪后再上传照片
+  loadCosSDK(function(){
+    if(!window.COS){ toast('云端服务未就绪，请联网后重试'); return; }
+    var remaining = fresh.length;
+    var failed = false;
+    var refs = new Array(fresh.length);
+    fresh.forEach(function(p, idx){
+      var pid = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,9);
+      uploadPhoto(pid, p.data, p.name, function(err, ref){
+        if(err){ failed = true; }
+        else { refs[idx] = ref; }
+        if(--remaining === 0){
+          var ordered = refs.filter(Boolean);
+          if(failed){
+            ordered.forEach(function(r){ deletePhoto(r.key); });
+            toast('照片上传失败，请检查网络后重试');
+          } else {
+            finalizeSubmit(type, cfg, project, data, keep.concat(ordered));
+          }
         }
-      }
+      });
     });
   });
 }
@@ -1148,7 +1184,7 @@ function finalizeSubmit(type, cfg, project, data, photos){
   renderSummary();
   syncLogbook(null, function(ok){ if(!ok) toast('已提交到本机，云端同步失败'); });
 }
-['office','site','accept'].forEach(function(type){
+['office','site'].forEach(function(type){
   document.getElementById(type+'-submit').addEventListener('click', function(){ submitLog(type); });
 });
 document.querySelectorAll('.yday').forEach(function(lb){
@@ -1268,12 +1304,11 @@ document.querySelectorAll('[data-goto]').forEach(function(b){
 /* ===== 计数 ===== */
 function refreshCounts(){
   var all = loadAll(), d = today();
-  var n = { office:0, site:0, accept:0 };
+  var n = { office:0, site:0 };
   all.forEach(function(r){ if(r.date === d && n[r.type] !== undefined) n[r.type]++; });
-  var total = n.office + n.site + n.accept;
+  var total = n.office + n.site;
   document.getElementById('cnt-office').textContent = '今日 ' + n.office + ' 条';
   document.getElementById('cnt-site').textContent   = '今日 ' + n.site + ' 条';
-  document.getElementById('cnt-accept').textContent = '今日 ' + n.accept + ' 条';
   document.getElementById('topChip').textContent    = '今日 ' + total + ' 条';
 }
 
@@ -1388,7 +1423,6 @@ function renderSummary(){
   renderIssueBoard();
   fillSection('sum-office', 'office', items);
   fillSection('sum-site',   'site',   items);
-  fillSection('sum-accept', 'accept', items);
   loadLogImages();
 }
 
@@ -1451,8 +1485,9 @@ function issueCardHtml(iss){
       return '<div class="tl-item"><span class="dot"></span><span class="t">' + fmtYmd(tl.t) + '</span><span class="c">' + esc(tl.txt) + '</span></div>';
     }).join('') + '</div>';
   }
-  // 操作：未解决显示「补充进展 + 标记已解决 + 删除」，已解决仅显示「删除」
+  // 操作：未解决显示「编辑 + 补充进展 + 标记已解决 + 删除」，已解决显示「编辑 + 删除」
   h += '<div class="icard-ops no-print">';
+  h += '<button class="op op-edit" data-iss-op="edit">编辑</button>';
   if(iss.coord !== 'resolved'){
     h += '<button class="op op-progress" data-iss-op="progress">补充进展</button>' +
          '<button class="op op-resolve" data-iss-op="resolve">标记已解决</button>';
@@ -1531,7 +1566,7 @@ function closeConfirm(){
   pendingDelIds = null;
   confirmBox.classList.remove('show');
 }
-['sum-office','sum-site','sum-accept'].forEach(function(id){
+['sum-office','sum-site'].forEach(function(id){
   document.getElementById(id).addEventListener('click', function(e){
     var edit = e.target.closest('[data-edit]');
     if(edit){ startEdit(edit.dataset.edit); return; }
@@ -1632,6 +1667,8 @@ document.getElementById('issue-list').addEventListener('click', function(e){
     openIssueConfirm(id);
   } else if(op === 'resolve'){
     openResolveConfirm(id);
+  } else if(op === 'edit'){
+    openIssueEdit(id);
   }
 });
 function openIssueInline(id){
@@ -1689,6 +1726,140 @@ function openResolveConfirm(id){
   confirmBox.classList.add('show');
 }
 
+/* ===== 问题台账：编辑弹框 ===== */
+var editingIssueId = null;
+var issueEditBox = document.getElementById('issue-edit-box');
+var iebDesc = document.getElementById('ieb-desc');
+var iebRisk = document.getElementById('ieb-risk');
+var iebCoord = document.getElementById('ieb-coord');
+var iebOwner = document.getElementById('ieb-owner');
+var iebTarget = document.getElementById('ieb-target');
+var iebTimeline = document.getElementById('ieb-timeline');
+var iebTlAddTxt = document.getElementById('ieb-tl-add-txt');
+function openIssueEdit(id){
+  var iss = findIssue(id);
+  if(!iss){ toast('未找到该问题'); return; }
+  editingIssueId = id;
+  iebDesc.value = iss.desc || '';
+  iebCoord.value = iss.coord || 'todo';
+  iebOwner.value = iss.owner || '';
+  iebTarget.value = iss.target || '';
+  setIebRisk(iss.risk);
+  renderIebTimeline(iss.timeline);
+  iebTlAddTxt.value = '';
+  issueEditBox.classList.add('show');
+}
+function setIebRisk(risk){
+  iebRisk.querySelectorAll('.risk-pill').forEach(function(p){
+    p.classList.remove('on-hi','on-mid','on-low');
+    if(p.dataset.risk === risk) p.classList.add('on-' + riskClassOf(risk));
+  });
+}
+/* 进展时间线：渲染（时间只读，内容可编辑，可删，可增） */
+function renderIebTimeline(timeline){
+  timeline = timeline || [];
+  if(!timeline.length){
+    iebTimeline.innerHTML = '<div class="ieb-tl-empty">暂无进展记录</div>';
+    return;
+  }
+  iebTimeline.innerHTML = timeline.map(function(tl, i){
+    return '<div class="ieb-tl-item" data-idx="' + i + '" data-t="' + esc(tl.t || '') + '">' +
+      '<span class="ieb-tl-time">' + fmtYmd(tl.t) + '</span>' +
+      '<div class="ieb-tl-body"><textarea class="ieb-tl-txt">' + esc(tl.txt || '') + '</textarea></div>' +
+      '<button type="button" class="ieb-tl-del" title="删除该进展">×</button>' +
+    '</div>';
+  }).join('');
+}
+/* 从弹窗收集当前时间线（按渲染顺序） */
+function readIebTimeline(){
+  var out = [];
+  iebTimeline.querySelectorAll('.ieb-tl-item').forEach(function(item){
+    var txt = (item.querySelector('.ieb-tl-txt').value || '').trim();
+    if(!txt) return;
+    out.push({ t: item.dataset.t, txt: txt });
+  });
+  return out;
+}
+
+function closeIssueEdit(){ editingIssueId = null; issueEditBox.classList.remove('show'); }
+function saveIssueEdit(){
+  var id = editingIssueId;
+  if(!id) return;
+  var desc = iebDesc.value.trim();
+  var onRisk = iebRisk.querySelector('.risk-pill.on-hi,.risk-pill.on-mid,.risk-pill.on-low');
+  var risk = onRisk ? onRisk.dataset.risk : '';
+  var coord = iebCoord.value;
+  var owner = iebOwner.value.trim();
+  var target = iebTarget.value.trim();
+  var timeline = readIebTimeline();
+  var now = new Date().toISOString();
+  var ok = updateIssue(id, function(iss){
+    iss.desc = desc;
+    iss.risk = risk;
+    iss.owner = owner;
+    iss.target = target;
+    // 协调状态变更：只更新 resolvedAt，进展时间线以弹窗内编辑结果为准
+    var wasResolved = iss.coord === 'resolved';
+    if(coord === 'resolved' && !wasResolved){
+      iss.resolvedAt = today();
+    } else if(coord !== 'resolved' && wasResolved){
+      iss.resolvedAt = '';
+    }
+    iss.coord = coord;
+    iss.timeline = timeline;
+    iss.updatedAt = now;
+  });
+  if(!ok){ closeIssueEdit(); toast('保存失败'); return; }
+  // 同步回源日志（同一 issId 的条目），保证编辑日志时不会回填旧值
+  var all = loadAll();
+  all.forEach(function(rec){
+    var arr = rec.data && rec.data['问题与风险'];
+    if(!Array.isArray(arr)) return;
+    arr.forEach(function(it){
+      if(it && it.issId === id){
+        it.desc = desc; it.risk = risk; it.owner = owner; it.target = target; it.coord = coord;
+      }
+    });
+  });
+  saveAll(all);
+  closeIssueEdit();
+  renderIssueBoard();
+  toast('已保存');
+  // 同步云端（含台账 + 日志）
+  syncLogbook(null, function(ok){ if(!ok) toast('本机已保存，云端同步失败，联网后会自动重试'); });
+}
+iebRisk.addEventListener('click', function(e){
+  var p = e.target.closest('.risk-pill');
+  if(!p) return;
+  setIebRisk(p.dataset.risk);
+});
+document.getElementById('ieb-save').addEventListener('click', saveIssueEdit);
+document.getElementById('ieb-cancel').addEventListener('click', closeIssueEdit);
+issueEditBox.addEventListener('click', function(e){ if(e.target === issueEditBox) closeIssueEdit(); });
+/* 进展时间线：删除某条 */
+iebTimeline.addEventListener('click', function(e){
+  var del = e.target.closest('.ieb-tl-del');
+  if(!del) return;
+  var item = del.closest('.ieb-tl-item');
+  if(item) item.remove();
+});
+/* 进展时间线：添加新进展 */
+document.getElementById('ieb-tl-add').addEventListener('click', function(){
+  var txt = (iebTlAddTxt.value || '').trim();
+  if(!txt){ toast('请填写进展内容'); return; }
+  var nowD = today();
+  // 追加到时间线列表末尾
+  var div = document.createElement('div');
+  div.className = 'ieb-tl-item';
+  div.dataset.t = nowD;
+  div.innerHTML = '<span class="ieb-tl-time">' + fmtYmd(nowD) + '</span>' +
+    '<div class="ieb-tl-body"><textarea class="ieb-tl-txt">' + esc(txt) + '</textarea></div>' +
+    '<button type="button" class="ieb-tl-del" title="删除该进展">×</button>';
+  iebTimeline.querySelector('.ieb-tl-empty') && iebTimeline.querySelector('.ieb-tl-empty').remove();
+  iebTimeline.appendChild(div);
+  iebTlAddTxt.value = '';
+});
+
 /* ===== 导出 PDF ===== */
 function exportFileName(d){
   // 由日志日期（而非导出当天）生成文件名：转播技术组 + MMDD
@@ -1722,10 +1893,11 @@ function appStart(){
   var w = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
   document.getElementById('todayText').textContent =
     (d.getMonth()+1) + '月' + d.getDate() + '日 ' + w;
-  ['office','site','accept'].forEach(function(t){ resetIssues(t); });
+  ['office','site'].forEach(function(t){ resetIssues(t); });
   refreshCounts();
   renderSummary();
-  syncLogbook();
+  // COS SDK 异步加载就绪后再做云端同步；未就绪则先走本地，加载完成后自动补同步
+  loadCosSDK(function(){ syncLogbook(); });
 }
 
 /* ===== 访问密码（整页遮罩） ===== */
